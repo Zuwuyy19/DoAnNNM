@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Navbar from "./components/Navbar";
+
 
 function App() {
   return (
@@ -14,6 +14,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/courses" element={<CourseList />} />
+        <Route path="/courses/:slug" element={<CourseDetail />} />
       </Routes>
     </BrowserRouter>
   );

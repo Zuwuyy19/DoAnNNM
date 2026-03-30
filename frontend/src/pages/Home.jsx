@@ -140,6 +140,10 @@ export default function Home() {
           <p className="home-subtitle">Nền tảng học lập trình hàng đầu</p>
 
           <div className="home-buttons">
+            <Link to="/courses" className="btn btn-primary" style={{ background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)' }}>
+              Khám phá Khóa học
+            </Link>
+
             <Link to="/login" className="btn btn-primary">
               Đăng nhập
             </Link>
