@@ -1,52 +1,50 @@
+// ================================================
+// PAGE: Login - Trang đăng nhập
+// Mô tả: Form đăng nhập với email và mật khẩu
+// FEATURE 2: Đăng nhập người dùng
+// ================================================
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
+import Icon from "../components/Icon";
 import "../styles/auth.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
+  // ================================================
+  // Xử lý submit form đăng nhập
+  // ================================================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Vui lòng nhập email và mật khẩu");
+      setError("Vui lòng nhập đầy đủ email và mật khẩu");
       return;
     }
 
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
+      const data = await login({ email, password });
 
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          password
-        })
-      });
-
-      const data = await res.json();
-      console.log("Login response:", data);
-
-      if (!res.ok) {
-        alert(data.message || "Đăng nhập thất bại");
-        return;
+      if (data.success) {
+        if (data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
+      } else {
+        setError(data.message || "Đăng nhập thất bại");
       }
-// lưu dữ liệu
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    alert("Đăng nhập thành công!");
-
-      // redirect
-      window.location.href = "/dashboard";
-
-    } catch (error) {
-      console.error(error);
-      alert("Không thể kết nối server");
+    } catch (err) {
+      const message = err.response?.data?.message || "Không thể kết nối server";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -54,58 +52,76 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="glow glow-1"></div>
-      <div className="glow glow-2"></div>
-
-      <div className="auth-card glass-panel">
+      {/* Card form đăng nhập */}
+      <div className="auth-card">
+        {/* Header */}
         <div className="auth-header">
-          <h2 className="text-gradient">Đăng nhập</h2>
+          <h2 style={{ display: "inline-flex", alignItems: "center", gap: "10px", justifyContent: "center" }}>
+            <span style={{ width: 28, height: 28, borderRadius: 10, background: "var(--gradient-primary)", color: "white", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: 12 }}>
+              DM
+            </span>
+            DevMaster
+          </h2>
           <p>Chào mừng bạn quay trở lại</p>
         </div>
 
+        {/* Thông báo lỗi */}
+        {error && (
+          <div className="message-box error" style={{ textAlign: "left" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <Icon name="lock" size={16} />
+              {error}
+            </span>
+          </div>
+        )}
+
+        {/* Form đăng nhập */}
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <i className="fas fa-envelope"></i>
+            <label>Email</label>
             <input
               type="email"
               placeholder="Email của bạn"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
             />
           </div>
 
           <div className="input-group">
-            <i className="fas fa-lock"></i>
+            <label>Mật khẩu</label>
             <input
               type="password"
               placeholder="Mật khẩu"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
             />
           </div>
 
-          <div className="auth-actions">
-            <a href="/forgot" className="forgot-link">
-              Quên mật khẩu?
-            </a>
-          </div>
-
+          {/* Nút đăng nhập */}
           <button
             type="submit"
-            className="btn btn-primary btn-large auth-btn"
+            className="btn btn-primary auth-btn"
             disabled={loading}
           >
-            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Đang đăng nhập...
+              </>
+            ) : (
+              "Đăng nhập"
+            )}
           </button>
         </form>
 
+        {/* Link đăng ký */}
         <p className="auth-footer">
           Chưa có tài khoản?{" "}
-          <a href="/register" className="text-gradient">
-            Đăng ký ngay
-          </a>
+          <Link to="/register">Đăng ký ngay</Link>
         </p>
       </div>
     </div>
