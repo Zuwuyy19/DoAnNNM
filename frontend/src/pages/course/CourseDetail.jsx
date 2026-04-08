@@ -1,4 +1,4 @@
-// ================================================
+﻿// ================================================
 // PAGE: CourseDetail - Trang chi tiết khóa học
 // Mô tả: Hiển thị thông tin đầy đủ, thêm vào giỏ hàng, đánh giá
 // FEATURE 12, 16, 17: Chi tiết, đánh giá, wishlist
@@ -37,45 +37,60 @@ export default function CourseDetail() {
   // EFFECT: Lấy thông tin khóa học + user khi mount
   // ================================================
   useEffect(() => {
-    fetchCourse();
     const currentUser = getUser();
     setUser(currentUser);
-    if (currentUser) {
-      checkEnrollment();
-    }
+    fetchCourse(currentUser);
   }, [slug]);
 
-  const checkEnrollment = async () => {
+  const checkEnrollment = async (currentUser, loadedCourse) => {
+    if (!currentUser || !loadedCourse) {
+      setIsEnrolled(false);
+      return;
+    }
+
     try {
+      const isAdmin = currentUser.role === "admin";
+      const instructorId = loadedCourse.instructor?._id || loadedCourse.instructor;
+      const isInstructorOwner =
+        currentUser.role === "instructor" && instructorId === currentUser.id;
+
+      if (isAdmin || isInstructorOwner) {
+        setIsEnrolled(true);
+        return;
+      }
+
       const res = await getMyEnrolledCourses();
       if (res.data?.success && res.data.data) {
-        // Có 3 trường hợp được coi là "đã sở hữu":
-        // 1. User đã mua (có trong enrolledCourses)
-        // 2. User là ADMIN (có quyền xem mọi thứ)
-        // 3. User là GIẢNG VIÊN của chính khóa học này
         const enrolled = res.data.data.some((c) => c.slug === slug);
-        const isAdmin = user?.role === "admin";
-        const isInstructorOwner = user?.role === "instructor" && course?.instructor?._id === user?.id;
-
-        setIsEnrolled(enrolled || isAdmin || isInstructorOwner);
+        setIsEnrolled(enrolled);
+      } else {
+        setIsEnrolled(false);
       }
     } catch (err) {
       console.log("Check enrollment error:", err);
+      setIsEnrolled(false);
     }
   };
 
   // ================================================
   // FEATURE 12: Lấy chi tiết khóa học theo slug
   // ================================================
-  const fetchCourse = async () => {
+  const fetchCourse = async (currentUser) => {
     setLoading(true);
     try {
       const res = await getCourseBySlug(slug);
       if (res.data.success) {
-        setCourse(res.data.data);
+        const loadedCourse = res.data.data;
+        setCourse(loadedCourse);
+        await checkEnrollment(currentUser, loadedCourse);
+      } else {
+        setCourse(null);
+        setIsEnrolled(false);
       }
     } catch (error) {
       console.error("Lỗi lấy chi tiết khóa học:", error);
+      setCourse(null);
+      setIsEnrolled(false);
     } finally {
       setLoading(false);
     }
@@ -281,7 +296,7 @@ export default function CourseDetail() {
           <div className={`message-box ${message.type}`}>{message.text}</div>
         )}
 
-        {/* ===== HERO ẢNH BÌA ===== */}
+        {/* ===== HERO ảnh bìa===== */}
         <div className="detail-hero">
           <img
             src={course.image}
@@ -443,7 +458,7 @@ export default function CourseDetail() {
                         Nội dung bị khóa
                       </div>
                       <h3 style={{ marginBottom:'8px' }}>Tài liệu bị khóa</h3>
-                      <p style={{ color:'var(--text-muted)' }}>Vui lòng mua khóa học để truy cập source code, PDF slide bài giảng và các tài liệu độc quyền khác.</p>
+                      <p style={{ color:'var(--text-muted)' }}>Vui lòng mua khóa học để truy cập source code, PDF slide bài giảng và các tài liệu được quyền khác.</p>
                       <button className="btn btn-primary" style={{ marginTop:'16px' }} onClick={handleBuyNow}>
                         Mua khóa học ngay
                       </button>
@@ -577,7 +592,7 @@ export default function CourseDetail() {
               }}
             />
             <div className="detail-sidebar-body">
-              {/* Giá */}
+              {/* GiÃ¡ */}
               <div>
                 {isEnrolled ? (
                   <span className="price-free" style={{ fontSize: "1.35rem", fontWeight: "900", color: "var(--success)" }}>
@@ -590,10 +605,10 @@ export default function CourseDetail() {
                 ) : hasDiscount ? (
                   <>
                     <span className="sidebar-price">
-                      {displayPrice.toLocaleString("vi-VN")}đ
+                      {displayPrice.toLocaleString("vi-VN")}Ä‘
                     </span>
                     <span className="sidebar-price-old">
-                      {course.price.toLocaleString("vi-VN")}đ
+                      {course.price.toLocaleString("vi-VN")}Ä‘
                     </span>
                     <span
                       style={{
@@ -612,7 +627,7 @@ export default function CourseDetail() {
                   </>
                 ) : (
                   <span className="sidebar-price">
-                    {displayPrice.toLocaleString("vi-VN")}đ
+                    {displayPrice.toLocaleString("vi-VN")}Ä‘
                   </span>
                 )}
               </div>
@@ -642,7 +657,7 @@ export default function CourseDetail() {
                       style={{ flex: 1, padding: "12px 0", fontSize: "1rem", borderRadius: "8px" }}
                       onClick={handleAddToCart}
                     >
-                      Thêm giỏ hàng
+                      Thêm vào giỏ hàng
                     </button>
                   </>
                 )}

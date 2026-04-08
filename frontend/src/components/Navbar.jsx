@@ -1,4 +1,4 @@
-// ================================================
+﻿// ================================================
 // COMPONENT: Navbar - Thanh điều hướng DÙNG CHUNG
 // Mô tả: Navbar thống nhất cho MỌI trang (kể cả Home)
 // Active underline animation + cart badge + user dropdown
@@ -38,7 +38,7 @@ const Navbar = () => {
     };
 
     updateNavbarData();
-    // Lắng nghe sự kiện thêm giỏ hàng (same-tab và cross-tab)
+    
     window.addEventListener("cartUpdated", updateNavbarData);
     window.addEventListener("storage", updateNavbarData);
 
@@ -57,9 +57,6 @@ const Navbar = () => {
     return false;
   };
 
-  // ================================================
-  // Xử lý đăng xuất
-  // ================================================
   const handleLogout = () => {
     logout();
     setUser(null);
@@ -75,7 +72,7 @@ const Navbar = () => {
           <img src="/logo-codenova.svg" alt="Courses" className="navbar-logo-image" />
         </Link>
 
-        {/* ===== MENU ĐIỀU HƯỚNG ===== */}
+        {/* ===== MENU ĐIỀU HƯỚNG===== */}
         <div className="navbar-links">
           <Link to="/" className={`nav-link ${isActive("/") ? "active" : ""}`}>
             Trang Chủ
@@ -85,27 +82,21 @@ const Navbar = () => {
           </Link>
           {user && (
             <>
-              {/* Menu cho Học viên */}
+              {/* Menu cho học viên */}
               {user.role === "student" && (
                 <Link to="/my-learning" className={`nav-link ${isActive("/my-learning") ? "active" : ""}`}>
-                  Học Tập
+                  Học Viên
                 </Link>
               )}
 
               {/* Menu cho Giảng viên */}
               {user.role === "instructor" && (
-                <Link to="/my-teaching" className={`nav-link ${isActive("/my-teaching") ? "active" : ""}`}>
-                  Giảng Dạy
+                <Link to="/teacher" className={`nav-link ${isActive("/teacher") ? "active" : ""}`}>
+                  Giảng Viên
                 </Link>
               )}
 
               {/* Menu cho Admin */}
-              {user.role === "admin" && (
-                <Link to="/admin" className={`nav-link ${isActive("/admin") ? "active" : ""}`}>
-                  Quản Trị
-                </Link>
-              )}
-
               <Link to="/my-orders" className={`nav-link ${isActive("/my-orders") ? "active" : ""}`}>
                 Đơn Hàng
               </Link>
@@ -118,7 +109,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* ===== ACTIONS BÊN PHẢI ===== */}
+        {/* ===== ACTIONS  ===== */}
         <div className="navbar-actions">
           {!user ? (
             <>
@@ -181,7 +172,7 @@ const Navbar = () => {
                       <strong>{user.name}</strong>
                       <span className="user-email">{user.email}</span>
                       <span className={`role-badge role-${user.role}`}>
-                        {user.role === "admin" ? "Quản trị viên" : user.role === "instructor" ? "Giảng viên" : "Học viên"}
+                        {user.role === "admin" ? "Quan tri vien" : user.role === "instructor" ? "Giang vien" : "Hoc vien"}
                       </span>
                     </div>
 
@@ -201,6 +192,13 @@ const Navbar = () => {
                       <span style={{ display: "inline-flex", alignItems: "center" }}><Icon name="clock" size={16} /></span>
                       Đơn hàng
                     </Link>
+
+                    {user.role === "instructor" && (
+                      <Link to="/teacher" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                        <span style={{ display: "inline-flex", alignItems: "center" }}><Icon name="bookOpen" size={16} /></span>
+                        Trang giảng viên
+                      </Link>
+                    )}
 
                     {user.role === "admin" && (
                       <Link to="/admin" className="dropdown-item dropdown-admin" onClick={() => setDropdownOpen(false)}>
@@ -234,3 +232,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
