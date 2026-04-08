@@ -1,4 +1,4 @@
-﻿// ================================================
+// ================================================
 // PAGE: CourseDetail - Trang chi tiết khóa học
 // Mô tả: Hiển thị thông tin đầy đủ, thêm vào giỏ hàng, đánh giá
 // FEATURE 12, 16, 17: Chi tiết, đánh giá, wishlist
@@ -465,26 +465,63 @@ export default function CourseDetail() {
                     </div>
                   ) : (
                     <div className="unlocked-resources">
-                      <div className="resource-item">
-                        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
-                          <Icon name="search" size={20} />
-                        </span>
-                        <div style={{flex:1}}>
-                          <div style={{fontWeight:'600'}}>Slide bài giảng toàn khóa (PDF)</div>
-                          <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>15.2 MB</div>
-                        </div>
-                        <button className="btn btn-outline btn-sm">Tải xuống</button>
-                      </div>
-                      <div className="resource-item">
-                        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
-                          <Icon name="settings" size={20} />
-                        </span>
-                        <div style={{flex:1}}>
-                          <div style={{fontWeight:'600'}}>Source code thực hành (ZIP)</div>
-                          <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>45.8 MB</div>
-                        </div>
-                        <button className="btn btn-outline btn-sm">Tải xuống</button>
-                      </div>
+                      {course.attachments && course.attachments.length > 0 ? (
+                        course.attachments.map((file, idx) => (
+                          <div key={idx} className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                              <Icon name="bookOpen" size={20} />
+                            </span>
+                            <div style={{flex:1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
+                              <div style={{fontWeight:'600'}}>{file.title || "Tài liệu đính kèm"}</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>{file.fileUrl}</div>
+                            </div>
+                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm">Mở link</a>
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                              <Icon name="search" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Slide bài giảng toàn khóa (PDF)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>15.2 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                              <Icon name="settings" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Source code thực hành (ZIP)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>45.8 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#3b82f6" }}>
+                              <Icon name="bookOpen" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Tài liệu tham khảo chi tiết (Word .docx)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>2.4 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#f59e0b" }}>
+                              <Icon name="bookOpen" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Bài tập thực hành buổi 1-5 (PPTX)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>12.1 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
               </div>

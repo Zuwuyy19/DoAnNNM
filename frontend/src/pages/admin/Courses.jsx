@@ -8,6 +8,8 @@ import { getAllCourses, createCourse, updateCourse, deleteCourse } from "../../s
 import { getAllCategories } from "../../services/categoryService";
 import AdminLayout from "../../components/AdminLayout";
 import Icon from "../../components/Icon";
+import CurriculumEditor from "../../components/CurriculumEditor";
+import CourseAttachmentsEditor from "../../components/CourseAttachmentsEditor";
 
 export default function AdminCourses() {
   // ================================================
@@ -43,6 +45,8 @@ export default function AdminCourses() {
     whatYouLearn: "",    // Học được gì sau khóa học
     instructor: "",      // ID giảng viên
     authorName: "",      // Tên giảng viên hiển thị
+    curriculum: [],      // Nội dung chương trình
+    attachments: [],     // Tài liệu đính kèm khóa học
   });
 
   // ================================================
@@ -103,7 +107,7 @@ export default function AdminCourses() {
       title: "", description: "", price: 0, discountPrice: "",
       category: categories[0]?._id || "", level: "Beginner", image: "",
       status: "draft", tags: "", prerequisites: "", whatYouLearn: "",
-      instructor: "", authorName: "",
+      instructor: "", authorName: "", curriculum: [], attachments: [],
     });
     setShowForm(true);
     setMessage({ type: "", text: "" });
@@ -129,6 +133,8 @@ export default function AdminCourses() {
       whatYouLearn: course.whatYouLearn || "",
       instructor: course.instructor?._id || course.instructor || "",
       authorName: course.authorName || "",
+      curriculum: course.curriculum || [],
+      attachments: course.attachments || [],
     });
     setShowForm(true);
     setMessage({ type: "", text: "" });
@@ -453,6 +459,18 @@ export default function AdminCourses() {
                 />
               </div>
             </div>
+
+            {/* Component quản lý Curriculum */}
+            <CurriculumEditor 
+              curriculum={formData.curriculum} 
+              onChange={(newCurriculum) => setFormData({ ...formData, curriculum: newCurriculum })} 
+            />
+
+            {/* Component quản lý Attachments */}
+            <CourseAttachmentsEditor
+              attachments={formData.attachments}
+              onChange={(newAttachments) => setFormData({ ...formData, attachments: newAttachments })}
+            />
 
             {/* Nút hành động: Hủy + Lưu */}
             <div className="admin-form-actions">

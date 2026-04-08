@@ -36,6 +36,14 @@ const sectionSchema = new mongoose.Schema(
   { _id: true, timestamps: false }
 );
 
+const attachmentSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    fileUrl: { type: String, required: true, trim: true },
+  },
+  { _id: true, timestamps: false }
+);
+
 const reviewSchema = new mongoose.Schema(
   {
     // Người đánh giá (ObjectId reference User)
@@ -138,6 +146,8 @@ const CourseSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // Tài liệu đính kèm của khóa học
+    attachments: [attachmentSchema],
     // Danh sách phần và bài học
     curriculum: [sectionSchema],
     // Mảng đánh giá từ học viên

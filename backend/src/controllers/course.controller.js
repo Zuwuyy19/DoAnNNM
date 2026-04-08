@@ -189,6 +189,7 @@ exports.createCourse = async (req, res) => {
       prerequisites,
       whatYouLearn,
       tags,
+      attachments,
       curriculum,
       status,
     } = req.body;
@@ -245,6 +246,7 @@ exports.createCourse = async (req, res) => {
       prerequisites,
       whatYouLearn,
       tags,
+      attachments,
       curriculum,
       totalLessons,
       totalDuration,
