@@ -37,6 +37,10 @@ exports.getAllCourses = async (req, res) => {
       if (status !== "all") {
         filter.status = status;
       }
+      // Nếu là giảng viên, chỉ lấy khóa học do chính họ tạo
+      if (req.user.role === "instructor") {
+        filter.instructor = req.user.id;
+      }
     } else {
       filter.status = "published";
     }
@@ -122,8 +126,8 @@ exports.getCourseBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // Tìm khóa học theo slug, populate đầy đủ thông tin
-    const course = await Course.findOne({ slug, status: "published" })
+    // Tìm khóa học theo slug, lấy tất cả trạng thái, populate đầy đủ thông tin
+    const course = await Course.findOne({ slug })
       .populate("category", "name slug description")
       .populate("instructor", "name avatar bio phone");
 
@@ -132,6 +136,25 @@ exports.getCourseBySlug = async (req, res) => {
         success: false,
         message: "Không tìm thấy khóa học",
       });
+    }
+
+    // Kiểm tra quyền xem nếu khóa học chưa published
+    if (course.status !== "published") {
+      let canView = false;
+      if (req.user) {
+        if (req.user.role === "admin") {
+          canView = true;
+        } else if (req.user.role === "instructor" && course.instructor && course.instructor._id.toString() === req.user.id) {
+          canView = true;
+        }
+      }
+
+      if (!canView) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy khóa học",
+        });
+      }
     }
 
     res.json({
@@ -166,6 +189,7 @@ exports.createCourse = async (req, res) => {
       prerequisites,
       whatYouLearn,
       tags,
+      attachments,
       curriculum,
       status,
     } = req.body;
@@ -222,6 +246,7 @@ exports.createCourse = async (req, res) => {
       prerequisites,
       whatYouLearn,
       tags,
+      attachments,
       curriculum,
       totalLessons,
       totalDuration,

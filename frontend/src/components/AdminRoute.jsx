@@ -18,7 +18,7 @@ const AdminRoute = ({ children }) => {
 
   // Đã đăng nhập nhưng không phải admin -> chuyển về trang chủ
   if (user && user.role !== "admin") {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/" />;
   }
 
   // Đã đăng nhập + là admin -> cho phép truy cập

@@ -143,7 +143,7 @@ exports.createOrder = async (req, res) => {
       totalAmount: finalAmount,
       couponCode: appliedCoupon ? appliedCoupon.code : null,
       discountAmount,
-      paymentMethod: paymentMethod || "cod",
+      paymentMethod: paymentMethod || "vnpay",
       buyerEmail: user.email,
     });
 
@@ -162,37 +162,14 @@ exports.createOrder = async (req, res) => {
           orderNumber: order.orderNumber,
           totalAmount: finalAmount,
           paymentMethod,
-          // DEV: paymentUrl sẽ được tạo từ cổng thanh toán thực
-          paymentUrl: `https://sandbox.vnpay.vn/payment?order=${order.orderNumber}`,
+          // Sử dụng hàm tiện ích để tạo URL thanh toán thật
+          paymentUrl: require("../utils/vnpay").createPaymentUrl(order, req.ip || req.connection.remoteAddress),
         },
       });
     }
 
-    // Nếu là COD: xử lý đăng ký khóa học ngay
-    if (paymentMethod === "cod") {
-      // Cập nhật paymentStatus = paid và orderStatus = completed
-      order.paymentStatus = "paid";
-      order.orderStatus = "completed";
-      await order.save();
-
-      // Thêm khóa học vào danh sách enrolledCourses của user
-      for (const item of orderItems) {
-        user.enrolledCourses.push(item.course);
-
-        // Tăng số lượng học viên trong khóa học
-        await Course.findByIdAndUpdate(item.course, {
-          $inc: { enrolledCount: 1 },
-        });
-      }
-
-      // Tăng số lần sử dụng coupon
-      if (appliedCoupon) {
-        appliedCoupon.usedCount += 1;
-        await appliedCoupon.save();
-      }
-
-      await user.save();
-    }
+    // Lưu ý: Đã loại bỏ phương thức COD cho sản phẩm số (Online Courses)
+    // Toàn bộ quy trình thanh toán sẽ được xử lý qua vnpayReturn/vnpayIPN
 
     res.status(201).json({
       success: true,
@@ -408,5 +385,132 @@ exports.applyCoupon = async (req, res) => {
       success: false,
       message: "Lỗi server",
     });
+  }
+};
+
+// ================================================
+// FEATURE: Xử lý kết quả trả về từ VNPay (Return URL)
+// ================================================
+exports.vnpayReturn = async (req, res) => {
+  try {
+    const vnp_Params = { ...req.query };
+    const { verifyReturnUrl } = require("../utils/vnpay");
+
+    console.log("--- VNPAY RETURN START ---");
+    console.log("Params received:", vnp_Params);
+
+    const isValid = verifyReturnUrl(vnp_Params);
+    console.log("Is signature valid?:", isValid);
+
+    // Lưu ý: vnp_Params đã bị xóa secureHash trong verifyReturnUrl
+    const orderNumber = req.query["vnp_TxnRef"];
+    const responseCode = req.query["vnp_ResponseCode"];
+
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Chữ ký không hợp lệ" });
+    }
+
+    const order = await Order.findOne({ orderNumber });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy đơn hàng" });
+    }
+
+    if (responseCode === "00") {
+      // THANH TOÁN THÀNH CÔNG -> CẤP QUYỀN TRUY CẬP NGAY
+      if (order.paymentStatus !== "paid") {
+        order.paymentStatus = "paid";
+        order.orderStatus = "completed"; // Chuyển từ processing -> completed ngay
+        order.transactionId = vnp_Params["vnp_TransactionNo"];
+        await order.save();
+
+        // Thêm khóa học vào enrolledCourses của user
+        const user = await User.findById(order.user);
+        for (const item of order.items) {
+          if (!user.enrolledCourses.includes(item.course)) {
+            user.enrolledCourses.push(item.course);
+            // Tăng số lượng học viên
+            await Course.findByIdAndUpdate(item.course, { $inc: { enrolledCount: 1 } });
+          }
+        }
+        await user.save();
+      }
+
+      return res.json({
+        success: true,
+        message: "Thanh toán thành công",
+        data: { orderId: order._id, orderNumber }
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: "Thanh toán bị hủy hoặc có lỗi xảy ra",
+        code: responseCode
+      });
+    }
+  } catch (error) {
+    console.error("CRITICAL: Lỗi vnpayReturn:", error);
+    res.status(500).json({ success: false, message: "Lỗi server: " + error.message });
+  }
+};
+
+// ================================================
+// FEATURE: Cập nhật trạng thái đơn qua IPN (Server-to-Server)
+// ================================================
+exports.vnpayIPN = async (req, res) => {
+  try {
+    const vnp_Params = req.query;
+    const { verifyReturnUrl } = require("../utils/vnpay");
+
+    const isValid = verifyReturnUrl({ ...vnp_Params });
+    if (!isValid) {
+      return res.status(200).json({ RspCode: "97", Message: "Invalid checksum" });
+    }
+
+    const orderNumber = vnp_Params["vnp_TxnRef"];
+    const responseCode = vnp_Params["vnp_ResponseCode"];
+    const vnp_Amount = vnp_Params["vnp_Amount"];
+
+    const order = await Order.findOne({ orderNumber });
+    if (!order) {
+      return res.status(200).json({ RspCode: "01", Message: "Order not found" });
+    }
+
+    // Kiểm tra số tiền (VNPay x100)
+    if (Math.round(order.totalAmount * 100) !== Number(vnp_Amount)) {
+      return res.status(200).json({ RspCode: "04", Message: "Amount invalid" });
+    }
+
+    // Kiểm tra trạng thái đơn hàng (chỉ xử lý nếu chưa thanh toán)
+    if (order.paymentStatus !== "pending") {
+      return res.status(200).json({ RspCode: "02", Message: "Order already confirmed" });
+    }
+
+    if (responseCode === "00") {
+      // THANH TOÁN THÀNH CÔNG
+      order.paymentStatus = "paid";
+      order.orderStatus = "completed";
+      order.transactionId = vnp_Params["vnp_TransactionNo"];
+      await order.save();
+
+      // Cấp quyền học cho user
+      const user = await User.findById(order.user);
+      for (const item of order.items) {
+        if (!user.enrolledCourses.includes(item.course)) {
+          user.enrolledCourses.push(item.course);
+          await Course.findByIdAndUpdate(item.course, { $inc: { enrolledCount: 1 } });
+        }
+      }
+      await user.save();
+
+      return res.status(200).json({ RspCode: "00", Message: "Success" });
+    } else {
+      // THANH TOÁN THẤT BẠI
+      order.paymentStatus = "failed";
+      await order.save();
+      return res.status(200).json({ RspCode: "00", Message: "Success (Payment Failed)" });
+    }
+  } catch (error) {
+    console.error("Lỗi vnpayIPN:", error);
+    res.status(500).json({ RspCode: "99", Message: "Unknown error" });
   }
 };

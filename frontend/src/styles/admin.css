@@ -344,7 +344,7 @@
 ================================================================ */
 .admin-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -407,6 +407,11 @@
   font-weight: 700;
   color: var(--admin-text-primary);
   line-height: 1.2;
+}
+
+.admin-stat-info h3.admin-stat-money {
+  font-size: 1.3rem; 
+  letter-spacing: -0.02em;
 }
 
 .admin-stat-info p {

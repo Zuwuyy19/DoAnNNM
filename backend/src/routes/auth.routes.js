@@ -16,6 +16,7 @@ const {
   getAllUsers,
   updateUserRole,
   toggleUserStatus,
+  deleteUser,
 } = require("../controllers/auth.controller");
 
 // Middleware xác thực
@@ -70,7 +71,9 @@ router.get("/users", verifyToken, requireAdmin, getAllUsers);
 router.put("/users/:userId/role", verifyToken, requireAdmin, updateUserRole);
 
 // FEATURE 10: Khóa/Mở tài khoản người dùng
-// PATCH /api/auth/users/:userId/status
 router.patch("/users/:userId/status", verifyToken, requireAdmin, toggleUserStatus);
+
+// FEATURE 11: Xóa tài khoản người dùng
+router.delete("/users/:userId", verifyToken, requireAdmin, deleteUser);
 
 module.exports = router;

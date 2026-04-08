@@ -91,11 +91,11 @@ ul { list-style: none; }
 
 /* Hero title */
 .home-hero-title {
-  font-size: 2.8rem;
+  font-size: 2.5rem; /* Giảm nhẹ để vừa với tên dài */
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.15;
-  margin-bottom: 16px;
+  line-height: 1.25;
+  margin-bottom: 20px;
   letter-spacing: -0.02em;
 }
 
@@ -104,6 +104,7 @@ ul { list-style: none; }
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block; /* Giữ tên đi cùng nhau nếu có thể */
 }
 
 /* Hero description */
