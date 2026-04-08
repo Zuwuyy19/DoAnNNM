@@ -276,7 +276,7 @@ export default function Home() {
                   return aOwned ? -1 : 1; // owned lên đầu
                 })
                 .map((course) => {
-                const isOwned = ownedCourseIds.has(course._id);
+                const isOwned = ownedCourseIds.has(course._id) || user?.role === "admin";
                 return (
                 <div
                   key={course._id}

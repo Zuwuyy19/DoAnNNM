@@ -114,7 +114,9 @@ export default function Learning() {
   };
 
   const handleLessonSelect = (lesson, sIdx, lIdx) => {
-    const isLocked = !isEnrolled && sIdx !== 0; 
+    const isAdmin = user?.role === "admin";
+    const isLocked = !isEnrolled && !isAdmin && sIdx !== 0; 
+    
     if (isLocked) {
       alert("Vui lòng mua khóa học để mở khóa bài giảng này!");
       navigate(`/courses/${course.slug}`);

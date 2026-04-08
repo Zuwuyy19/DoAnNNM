@@ -199,7 +199,7 @@ export default function CourseDetail() {
         setMessage({ type: "success", text: "Đánh giá thành công!" });
         setShowReviewForm(false);
         setReviewComment("");
-        fetchCourse();
+        fetchCourse(user);
       }
     } catch (err) {
       setMessage({
@@ -452,7 +452,7 @@ export default function CourseDetail() {
               {/* SECTION 3: RESOURCES */}
               <div id="resources" className="tab-pane" style={{ marginBottom: '40px' }}>
                 <div className="detail-section-title">Tài liệu đính kèm</div>
-                  {!isEnrolled ? (
+                  {!isEnrolled && user?.role !== 'admin' ? (
                     <div className="locked-resources glass-panel" style={{ textAlign:'center', padding:'40px 20px' }}>
                       <div style={{ fontSize:'1.6rem', marginBottom:'12px', fontWeight: 800, color: 'var(--text-primary)' }}>
                         Nội dung bị khóa

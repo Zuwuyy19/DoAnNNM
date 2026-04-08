@@ -440,13 +440,15 @@ exports.toggleUserStatus = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Dùng aggregation pipeline để toggle boolean field
-    // $not: đảo ngược giá trị hiện tại của isActive
-    const user = await User.findByIdAndUpdate(
-      userId,
-      [{ $set: { isActive: { $not: "$isActive" } } }],
-      { new: true }
-    ).select("-password");
+    // Ngăn chặn admin tự khóa chính mình
+    if (userId === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: "Bạn không thể tự khóa tài khoản của chính mình",
+      });
+    }
+
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -455,18 +457,25 @@ exports.toggleUserStatus = async (req, res) => {
       });
     }
 
+    // Đảo ngược trạng thái isActive
+    user.isActive = !user.isActive;
+    await user.save();
+
     res.json({
       success: true,
       message: user.isActive
         ? "Tài khoản đã được kích hoạt trở lại"
-        : "Tài khoản đã bị khóa",
-      data: user,
+        : "Tài khoản đã bị khóa thành công",
+      data: {
+        id: user._id,
+        isActive: user.isActive
+      },
     });
   } catch (error) {
     console.error("Lỗi toggle user status:", error);
     res.status(500).json({
       success: false,
-      message: "Lỗi server",
+      message: "Lỗi hệ thống khi thay đổi trạng thái tài khoản",
     });
   }
 };
@@ -487,24 +496,30 @@ exports.deleteUser = async (req, res) => {
       });
     }
 
-    const user = await User.findByIdAndDelete(userId);
-
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Không tìm thấy người dùng",
+        message: "Không tìm thấy người dùng để xóa",
       });
     }
 
+    // Ngăn chặn xóa tài khoản Admin khác (Tùy chọn bảo mật)
+    if (user.role === 'admin' && req.user.role !== 'admin') {
+       return res.status(403).json({ success: false, message: "Bạn không có quyền xóa tài khoản Quản trị viên khác" });
+    }
+
+    await User.findByIdAndDelete(userId);
+
     res.json({
       success: true,
-      message: "Đã xóa người dùng thành công",
+      message: "Đã xóa người dùng thành công khỏi hệ thống",
     });
   } catch (error) {
     console.error("Lỗi xóa người dùng:", error);
     res.status(500).json({
       success: false,
-      message: "Lỗi server",
+      message: "Lỗi hệ thống khi thực hiện xóa tài khoản",
     });
   }
 };
