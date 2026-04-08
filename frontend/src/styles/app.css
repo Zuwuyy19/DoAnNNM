@@ -1,0 +1,331 @@
+/* ================================================================
+   APP.CSS - CSS TOÀN CỤC - THEME SÁNG CHUYÊN NGHIỆP
+   ================================================================
+   1. Variables & Reset          - Biến màu, reset CSS
+   2. Global Elements            - html, body, a, img, h1-h6
+   3. Scrollbar                 - Thanh cuộn tùy chỉnh
+   4. Page Transitions          - Animation chuyển trang
+   5. Utilities                 - Tiện ích dùng chung
+   6. Loading / Spinner         - Trạng thái loading
+   7. Message Boxes             - Thông báo thành công/lỗi
+================================================================ */
+
+/* ================================================================
+   1. BIẾN MÀU & RESET
+================================================================ */
+:root {
+  /* Nền - TRẮNG/SÁNG */
+  --bg-page: #f8fafc;
+  --bg-white: #ffffff;
+  --bg-gray-50: #f8fafc;
+  --bg-gray-100: #f1f5f9;
+  --bg-gray-200: #e2e8f0;
+
+  /* Chữ */
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-light: #cbd5e1;
+
+  /* Màu chủ đạo - XANH DƯƠNG */
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #eff6ff;
+  --primary-border: #bfdbfe;
+  --primary-shadow: rgba(59, 130, 246, 0.2);
+
+  /* Màu gradient */
+  --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --gradient-success: linear-gradient(135deg, #10b981, #06b6d4);
+  --gradient-hero: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 50%, #fdf2f8 100%);
+
+  /* Màu phụ */
+  --success: #10b981;
+  --success-light: #ecfdf5;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --purple: #8b5cf6;
+  --purple-light: #f5f3ff;
+
+  /* Viền & bóng */
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+
+  /* Bo góc */
+  --radius: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Font */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Transition */
+  --transition: all 0.2s ease;
+  --transition-slow: all 0.3s ease;
+}
+
+/* ================================================================
+   2. RESET TOÀN CỤC
+================================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ================================================================
+   3. SCROLLBAR TÙY CHỈNH
+================================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ================================================================
+   4. PAGE TRANSITIONS - ANIMATION CHUYỂN TRANG
+   Mỗi trang khi vào sẽ fade + slide nhẹ từ trên xuống
+================================================================ */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Áp dụng animation cho tất cả route changes */
+.page-enter {
+  animation: pageEnter 0.35s ease-out;
+}
+
+.page-fade {
+  animation: fadeIn 0.3s ease;
+}
+
+/* ================================================================
+   4b. MOTION SYSTEM - MICRO INTERACTIONS
+   Buttons/cards feel "alive" but subtle
+================================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .btn, button, a {
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .btn:active, button:active {
+    transform: translateY(1px);
+  }
+
+  .btn:focus-visible, button:focus-visible, a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    border-radius: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================================
+   5. UTILITIES - CLASS TIỆN ÍCH
+================================================================ */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.glass-panel {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ================================================================
+   6. LOADING STATES
+================================================================ */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner-dark {
+  border-color: rgba(59, 130, 246, 0.2);
+  border-top-color: var(--primary);
+}
+
+.spinner-large {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+}
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.loading-state p, .empty-state p {
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.spinner-large {
+  margin: 0 auto;
+}
+
+/* ================================================================
+   7. MESSAGE BOXES - THÔNG BÁO
+================================================================ */
+.message-box {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  animation: scaleIn 0.2s ease;
+}
+
+.message-box.success {
+  background-color: var(--success-light);
+  color: var(--success);
+  border: 1px solid #a7f3d0;
+}
+
+.message-box.error {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.message-box.warning {
+  background-color: var(--warning-light);
+  color: var(--warning);
+  border: 1px solid #fde68a;
+}
+
+.message-box.info {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+}

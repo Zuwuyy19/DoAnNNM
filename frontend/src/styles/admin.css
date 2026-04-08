@@ -1,0 +1,1229 @@
+/* ================================================================
+   ADMIN THEME - GIAO DIỆN SÁNG CHUYÊN NGHIỆP
+   ================================================================
+   Màu nền trắng/sáng, sidebar điều hướng, bảng dữ liệu chuyên nghiệp
+   1. Variables - Biến màu & kích thước
+   2. Admin Layout - Sidebar + Main content
+   3. Admin Header - Thanh tiêu đề + breadcrumb
+   4. Admin Stats Cards - Thẻ thống kê
+   5. Admin Table - Bảng dữ liệu
+   6. Admin Form - Form nhập liệu
+   7. Buttons - Các loại nút bấm
+   8. Badges & Status - Tag trạng thái
+   9. Messages - Thông báo thành công/lỗi
+   10. Loading - Trạng thái loading
+   11. Utilities - Tiện ích
+================================================================ */
+
+/* ================================================================
+   1. BIẾN MÀU - MÀU SẮC CHỦ ĐẠO
+================================================================ */
+:root {
+  /* Nền chính - TRẮNG cho giao diện sáng */
+  --admin-bg: #f1f5f9;
+  --admin-white: #ffffff;
+  --admin-sidebar-bg: #1e293b;
+  --admin-sidebar-hover: #334155;
+  --admin-sidebar-active: #3b82f6;
+
+  /* Màu chữ */
+  --admin-text-primary: #1e293b;
+  --admin-text-secondary: #64748b;
+  --admin-text-muted: #94a3b8;
+  --admin-text-light: #cbd5e1;
+
+  /* Màu chủ đạo - XANH DƯƠNG chuyên nghiệp */
+  --admin-primary: #3b82f6;
+  --admin-primary-hover: #2563eb;
+  --admin-primary-light: #eff6ff;
+  --admin-primary-border: #bfdbfe;
+
+  /* Màu phụ */
+  --admin-success: #10b981;
+  --admin-success-light: #ecfdf5;
+  --admin-danger: #ef4444;
+  --admin-danger-light: #fef2f2;
+  --admin-warning: #f59e0b;
+  --admin-warning-light: #fffbeb;
+  --admin-purple: #8b5cf6;
+  --admin-purple-light: #f5f3ff;
+
+  /* Viền & bóng */
+  --admin-border: #e2e8f0;
+  --admin-border-light: #f1f5f9;
+  --admin-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --admin-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --admin-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  /* Kích thước sidebar */
+  --admin-sidebar-width: 260px;
+  --admin-header-height: 64px;
+
+  /* Bo góc */
+  --admin-radius: 8px;
+  --admin-radius-lg: 12px;
+  --admin-radius-xl: 16px;
+
+  /* Font */
+  --admin-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ================================================================
+   2. ADMIN LAYOUT - BỐ CỤC CHÍNH
+================================================================ */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: var(--admin-font);
+  background-color: var(--admin-bg);
+}
+
+/* ----- Sidebar ----- */
+.admin-sidebar {
+  width: var(--admin-sidebar-width);
+  background-color: var(--admin-sidebar-bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Logo / Thương hiệu trong sidebar */
+.admin-sidebar-logo {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-sidebar-logo .logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.admin-sidebar-logo .logo-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.admin-sidebar-logo .logo-sub {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Menu điều hướng trong sidebar */
+.admin-sidebar-menu {
+  padding: 16px 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.admin-menu-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 8px 12px 6px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.admin-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--admin-radius);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.admin-menu-item:hover {
+  background-color: var(--admin-sidebar-hover);
+  color: white;
+}
+
+.admin-menu-item.active {
+  background-color: var(--admin-sidebar-active);
+  color: white;
+  font-weight: 600;
+}
+
+.admin-menu-item .menu-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.admin-menu-item .menu-badge {
+  margin-left: auto;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* User info ở cuối sidebar */
+.admin-sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--admin-radius);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.admin-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.admin-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-user-role {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-user-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.admin-user-btn:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ----- Main Content ----- */
+.admin-main {
+  margin-left: var(--admin-sidebar-width);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================================================================
+   3. ADMIN HEADER - TIÊU ĐỀ TRANG
+================================================================ */
+.admin-header {
+  background-color: var(--admin-white);
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.admin-header-left h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  margin-bottom: 2px;
+}
+
+.admin-header-left p {
+  font-size: 0.8rem;
+  color: var(--admin-text-secondary);
+}
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--admin-text-secondary);
+}
+
+.admin-breadcrumb a {
+  color: var(--admin-primary);
+  text-decoration: none;
+}
+
+.admin-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* ================================================================
+   4. ADMIN CONTENT - NỘI DUNG CHÍNH
+================================================================ */
+.admin-content {
+  padding: 24px 28px;
+  flex: 1;
+}
+
+/* ================================================================
+   5. ADMIN STATS - THẺ THỐNG KÊ
+================================================================ */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-stat-card {
+  background-color: var(--admin-white);
+  border-radius: var(--admin-radius-lg);
+  padding: 20px;
+  border: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--admin-shadow);
+  transition: all 0.2s ease;
+}
+
+.admin-stat-card:hover {
+  box-shadow: var(--admin-shadow-md);
+  transform: translateY(-1px);
+}
+
+.admin-stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--admin-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.admin-stat-icon.blue {
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+}
+
+.admin-stat-icon.green {
+  background-color: var(--admin-success-light);
+  color: var(--admin-success);
+}
+
+.admin-stat-icon.purple {
+  background-color: var(--admin-purple-light);
+  color: var(--admin-purple);
+}
+
+.admin-stat-icon.warning {
+  background-color: var(--admin-warning-light);
+  color: var(--admin-warning);
+}
+
+.admin-stat-icon.danger {
+  background-color: var(--admin-danger-light);
+  color: var(--admin-danger);
+}
+
+.admin-stat-info h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  line-height: 1.2;
+}
+
+.admin-stat-info p {
+  font-size: 0.8rem;
+  color: var(--admin-text-secondary);
+  margin-top: 2px;
+}
+
+/* ================================================================
+   6. ADMIN TABLE - BẢNG DỮ LIỆU
+================================================================ */
+.admin-table-wrapper {
+  background-color: var(--admin-white);
+  border-radius: var(--admin-radius-lg);
+  border: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.admin-table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-table-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+}
+
+.admin-table-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-table-search {
+  padding: 7px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  font-size: 0.8rem;
+  color: var(--admin-text-primary);
+  background-color: var(--admin-bg);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 220px;
+}
+
+.admin-table-search:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.admin-table-filter-select {
+  padding: 7px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  font-size: 0.8rem;
+  color: var(--admin-text-primary);
+  background-color: var(--admin-bg);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Bảng dữ liệu */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table thead {
+  background-color: #f8fafc;
+}
+
+.admin-table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--admin-border);
+  white-space: nowrap;
+}
+
+.admin-table tbody tr {
+  border-bottom: 1px solid var(--admin-border-light);
+  transition: background-color 0.15s;
+}
+
+.admin-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.admin-table tbody td {
+  padding: 14px 16px;
+  font-size: 0.85rem;
+  color: var(--admin-text-primary);
+  vertical-align: middle;
+}
+
+/* Cell hình ảnh thumbnail */
+.admin-table-thumb {
+  width: 56px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--admin-border);
+}
+
+/* Cell họ tên người dùng */
+.admin-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-user-cell-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.admin-user-cell-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.admin-user-cell-name {
+  font-weight: 600;
+  color: var(--admin-text-primary);
+}
+
+.admin-user-cell-email {
+  font-size: 0.75rem;
+  color: var(--admin-text-secondary);
+}
+
+/* Cell tiêu đề khóa học */
+.admin-course-cell {
+  max-width: 220px;
+}
+
+.admin-course-cell-title {
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+
+.admin-course-cell-cat {
+  font-size: 0.75rem;
+  color: var(--admin-text-secondary);
+}
+
+/* Cell giá tiền */
+.admin-price-old {
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  text-decoration: line-through;
+  margin-right: 4px;
+}
+
+.admin-price-sale {
+  font-weight: 700;
+  color: var(--admin-danger);
+}
+
+.admin-price-normal {
+  font-weight: 600;
+  color: var(--admin-text-primary);
+}
+
+.admin-price-free {
+  color: var(--admin-success);
+  font-weight: 600;
+}
+
+/* Cell trống */
+.admin-empty-cell {
+  text-align: center;
+  color: var(--admin-text-muted);
+  padding: 48px !important;
+  font-style: italic;
+}
+
+/* ================================================================
+   7. ADMIN FORM - FORM NHẬP LIỆU
+================================================================ */
+.admin-form-card {
+  background-color: var(--admin-white);
+  border-radius: var(--admin-radius-lg);
+  border: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.admin-form-card h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.admin-form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+}
+
+.admin-form-group label .required {
+  color: var(--admin-danger);
+  margin-left: 2px;
+}
+
+.admin-form-group input,
+.admin-form-group select,
+.admin-form-group textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  font-size: 0.85rem;
+  color: var(--admin-text-primary);
+  background-color: var(--admin-white);
+  font-family: var(--admin-font);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.admin-form-group input:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.admin-form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.admin-form-group input[type="color"] {
+  padding: 4px;
+  height: 38px;
+  cursor: pointer;
+}
+
+/* Hành động form */
+.admin-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--admin-border);
+  margin-top: 8px;
+}
+
+/* ================================================================
+   8. BUTTONS - NÚT BẤM
+================================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--admin-radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--admin-font);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--admin-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--admin-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-success {
+  background-color: var(--admin-success);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #059669;
+}
+
+.btn-danger {
+  background-color: var(--admin-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--admin-text-secondary);
+  border: 1px solid var(--admin-border);
+}
+
+.btn-outline:hover {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-primary);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.78rem;
+}
+
+.btn-lg {
+  padding: 12px 24px;
+  font-size: 1rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Nút hành động trong bảng */
+.btn-action {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-edit {
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+  border-color: var(--admin-primary-border);
+}
+
+.btn-edit:hover {
+  background-color: var(--admin-primary);
+  color: white;
+}
+
+.btn-delete {
+  background-color: var(--admin-danger-light);
+  color: var(--admin-danger);
+  border-color: #fecaca;
+}
+
+.btn-delete:hover {
+  background-color: var(--admin-danger);
+  color: white;
+}
+
+/* ================================================================
+   9. BADGES - TAG TRẠNG THÁI
+================================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Badge cấp độ */
+.badge-level {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-secondary);
+  border: 1px solid var(--admin-border);
+}
+
+.badge-level.badge-beginner {
+  background-color: var(--admin-success-light);
+  color: var(--admin-success);
+  border-color: #a7f3d0;
+}
+
+.badge-level.badge-intermediate {
+  background-color: var(--admin-warning-light);
+  color: var(--admin-warning);
+  border-color: #fde68a;
+}
+
+.badge-level.badge-advanced {
+  background-color: var(--admin-danger-light);
+  color: var(--admin-danger);
+  border-color: #fecaca;
+}
+
+/* Badge trạng thái */
+.badge-status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-published {
+  background-color: var(--admin-success-light);
+  color: var(--admin-success);
+}
+
+.badge-draft {
+  background-color: var(--admin-warning-light);
+  color: var(--admin-warning);
+}
+
+.badge-archived {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-muted);
+}
+
+/* Badge vai trò */
+.badge-role {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background-color: var(--admin-purple-light);
+  color: var(--admin-purple);
+}
+
+.badge-instructor {
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+}
+
+.badge-user {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-secondary);
+}
+
+/* ================================================================
+   10. MESSAGES - THÔNG BÁO
+================================================================ */
+.message-box {
+  padding: 12px 16px;
+  border-radius: var(--admin-radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message-box.success {
+  background-color: var(--admin-success-light);
+  color: var(--admin-success);
+  border: 1px solid #a7f3d0;
+}
+
+.message-box.error {
+  background-color: var(--admin-danger-light);
+  color: var(--admin-danger);
+  border: 1px solid #fecaca;
+}
+
+.message-box.warning {
+  background-color: var(--admin-warning-light);
+  color: var(--admin-warning);
+  border: 1px solid #fde68a;
+}
+
+.message-box.info {
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+  border: 1px solid var(--admin-primary-border);
+}
+
+/* ================================================================
+   11. LOADING - TRẠNG THÁI TẢI
+================================================================ */
+.admin-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--admin-text-secondary);
+  font-size: 0.9rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.spinner-dark {
+  border-color: rgba(59, 130, 246, 0.3);
+  border-top-color: var(--admin-primary);
+}
+
+.spinner-large {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================================================================
+   12. ADMIN CARDS - CARD TỔNG HỢP
+================================================================ */
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.admin-card {
+  background-color: var(--admin-white);
+  border-radius: var(--admin-radius-lg);
+  border: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow);
+  padding: 20px;
+}
+
+.admin-card h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Danh sách trong card */
+.admin-list {
+  list-style: none;
+}
+
+.admin-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--admin-border-light);
+}
+
+.admin-list-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.admin-list-rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-list-title {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-list-meta {
+  font-size: 0.75rem;
+  color: var(--admin-text-secondary);
+  margin-top: 1px;
+}
+
+.admin-list-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   13. PAGINATION - PHÂN TRANG
+================================================================ */
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+}
+
+.admin-pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background-color: var(--admin-white);
+  color: var(--admin-text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-pagination button:hover {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-primary);
+}
+
+.admin-pagination button.active {
+  background-color: var(--admin-primary);
+  color: white;
+  border-color: var(--admin-primary);
+}
+
+.admin-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ================================================================
+   14. PAGE ACTIONS BAR - THANH HÀNH ĐỘNG
+================================================================ */
+.admin-page-actions {
+  background-color: var(--admin-white);
+  border-radius: var(--admin-radius-lg);
+  border: 1px solid var(--admin-border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  box-shadow: var(--admin-shadow);
+}
+
+/* ================================================================
+   12. CARD LINKS - Link trong card
+================================================================ */
+.admin-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-primary);
+  text-decoration: none;
+  transition: gap 0.2s;
+}
+
+.admin-card-link:hover {
+  gap: 8px;
+}
+
+/* ================================================================
+   13. PAGINATION - PHÂN TRANG
+================================================================ */
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+}
+
+.admin-pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background-color: var(--admin-white);
+  color: var(--admin-text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-pagination button:hover {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-primary);
+}
+
+.admin-pagination button.active {
+  background-color: var(--admin-primary);
+  color: white;
+  border-color: var(--admin-primary);
+}
+
+.admin-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ================================================================
+   14. PAGE ACTIONS BAR - THANH HÀNH ĐỘNG
+================================================================ */
+.admin-page-actions {
+  background-color: var(--admin-white);
+  border-radius: var(--admin-radius-lg);
+  border: 1px solid var(--admin-border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  box-shadow: var(--admin-shadow);
+}
+
+/* ================================================================
+   15. RESPONSIVE - ĐIỆN THOẠI
+================================================================ */
+@media (max-width: 1024px) {
+  :root {
+    --admin-sidebar-width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .admin-header {
+    padding: 14px 16px;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

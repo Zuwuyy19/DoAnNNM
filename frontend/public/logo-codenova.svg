@@ -1,0 +1,28 @@
+<svg width="300" height="72" viewBox="0 0 300 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="8" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0EA5E9"/>
+      <stop offset="0.45" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="38" y1="38" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#FB7185"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="10" y="8" width="56" height="56" rx="16" fill="url(#bg)"/>
+
+  <path d="M22 44V27.5C22 24.5 24.5 22 27.5 22C30.5 22 33 24.5 33 27.5V34.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M33 34.5V44" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M33 44V27.5C33 24.5 35.5 22 38.5 22C41.5 22 44 24.5 44 27.5V34.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M44 34.5V44" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M44 44V30.5C44 27.5 46.5 25 49.5 25" stroke="white" stroke-width="4" stroke-linecap="round"/>
+
+  <circle cx="52" cy="50" r="8" fill="url(#accent)" stroke="white" stroke-width="2"/>
+  <path d="M48.5 49.2H55.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M50 51.5H54" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+
+  <text x="78" y="33" fill="#0F172A" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="800">Courses</text>
+  <text x="78" y="51" fill="#475569" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">LEARN - BUILD - GROW</text>
+</svg>

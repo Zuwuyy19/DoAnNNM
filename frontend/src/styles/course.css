@@ -1,287 +1,791 @@
+/* ================================================================
+   COURSE.CSS - TRANG DANH SÁCH & CHI TIẾT KHÓA HỌC
+   Theme sáng, chuyên nghiệp, animation mượt
+   ================================================================
+   1. Course List Container
+   2. Course List Header
+   3. Category Filters
+   4. Course Grid
+   5. Course Card
+   6. Pagination
+   7. Course Detail Page
+   8. Responsive
+================================================================ */
+
+/* ================================================================
+   1. COURSE LIST CONTAINER
+================================================================ */
 .courses-container {
   min-height: 100vh;
-  background-color: #0a0c14;
-  color: #f8fafc;
-  padding: 60px 40px;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-gray-50);
+  font-family: var(--font);
+  animation: pageEnter 0.35s ease-out;
 }
 
+/* ================================================================
+   2. COURSE LIST HEADER
+================================================================ */
 .courses-header {
+  background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+  padding: 56px 24px 40px;
   text-align: center;
-  margin-bottom: 50px;
+  border-bottom: 1px solid var(--border);
 }
 
 .courses-title {
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
+.courses-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+/* Thanh tìm kiếm */
+.search-bar {
+  max-width: 520px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 13px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: white;
+  outline: none;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  font-family: var(--font);
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12), var(--shadow);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-bar::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Bộ sắp xếp */
+.sort-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 16px;
+}
+
+.sort-options select {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background: white;
+  cursor: pointer;
+  outline: none;
+  font-family: var(--font);
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.sort-options select:focus {
+  border-color: var(--primary);
+}
+
+/* ================================================================
+   3. CATEGORY FILTERS
+================================================================ */
 .category-filters {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 40px;
+  gap: 8px;
+  padding: 24px;
   flex-wrap: wrap;
-}
-
-.filter-btn {
-  padding: 10px 20px;
-  border-radius: 30px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.filter-btn:hover, .filter-btn.active {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: #10b981;
-  color: #10b981;
-  transform: translateY(-2px);
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-.course-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  overflow: hidden;
-  transition: all 0.4s ease;
+.filter-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  background: var(--bg-white);
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.83rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.filter-btn.active:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* ================================================================
+   4. COURSE GRID
+================================================================ */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+/* ================================================================
+   5. COURSE CARD - Card khóa học
+================================================================ */
+.course-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
-  text-decoration: none;
-  color: inherit;
+  cursor: pointer;
+  animation: slideUpSoft 0.45s cubic-bezier(.2,.9,.2,1) both;
+  will-change: transform, opacity;
 }
 
 .course-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.12);
+  transform: translateY(-4px);
 }
 
+/* Stagger effect for course list cards */
+.courses-grid .course-card:nth-child(1) { animation-delay: 0ms; }
+.courses-grid .course-card:nth-child(2) { animation-delay: 35ms; }
+.courses-grid .course-card:nth-child(3) { animation-delay: 70ms; }
+.courses-grid .course-card:nth-child(4) { animation-delay: 105ms; }
+.courses-grid .course-card:nth-child(5) { animation-delay: 140ms; }
+.courses-grid .course-card:nth-child(6) { animation-delay: 175ms; }
+.courses-grid .course-card:nth-child(7) { animation-delay: 210ms; }
+.courses-grid .course-card:nth-child(8) { animation-delay: 245ms; }
+.courses-grid .course-card:nth-child(9) { animation-delay: 280ms; }
+.courses-grid .course-card:nth-child(10) { animation-delay: 315ms; }
+.courses-grid .course-card:nth-child(11) { animation-delay: 350ms; }
+.courses-grid .course-card:nth-child(12) { animation-delay: 385ms; }
+
+@keyframes slideUpSoft {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ảnh bìa */
 .course-image {
   width: 100%;
-  height: 200px;
+  height: 180px;
   object-fit: cover;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: block;
+  transition: transform 0.3s ease;
 }
 
+.course-card:hover .course-image {
+  transform: scale(1.03);
+}
+
+/* Nội dung card */
 .course-content {
-  padding: 24px;
-  flex-grow: 1;
+  padding: 18px;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
+/* Badge danh mục */
 .course-badge {
   display: inline-block;
-  padding: 4px 10px;
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  align-self: flex-start;
-}
-
-.course-card-title {
-  font-size: 1.25rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
   font-weight: 700;
-  margin-bottom: 12px;
-  line-height: 1.4;
-  color: #f1f5f9;
+  align-self: flex-start;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.course-card-desc {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  margin-bottom: 20px;
-  line-height: 1.5;
+/* Tiêu đề */
+.course-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+/* Mô tả ngắn */
+.course-card-desc {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Footer card: giá + cấp độ */
 .course-footer {
-  margin-top: auto;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+  margin-top: auto;
 }
 
+/* Giá */
 .course-price {
-  font-size: 1.25rem;
+  font-size: 0.95rem;
   font-weight: 800;
-  color: #10b981;
-}
-
-.course-level {
-  font-size: 0.85rem;
-  color: #64748b;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-/* Detail Page Styles */
+.price-old {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.price-sale {
+  color: var(--danger);
+}
+
+.price-free {
+  color: var(--success);
+}
+
+.price-normal {
+  color: var(--text-primary);
+}
+
+/* Cấp độ */
+.course-level {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--bg-gray-100);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ================================================================
+   5b. COURSE CARD ACTIONS - NÚT MUA NGAY & THÊM GIỎ HÀNG
+================================================================ */
+.course-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.course-card-actions .btn {
+  flex: 1;
+  padding: 9px 0;
+  font-size: 0.85rem;
+  border-radius: var(--radius) !important;
+  justify-content: center;
+}
+
+/* ================================================================
+   6. PAGINATION - PHÂN TRANG
+================================================================ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-info {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 0 12px;
+}
+
+/* ================================================================
+   7. COURSE DETAIL PAGE - TRANG CHI TIẾT KHÓA HỌC
+================================================================ */
 .course-detail-container {
   min-height: 100vh;
-  background-color: #0a0c14;
-  color: #f8fafc;
-  padding: 40px 20px;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-gray-50);
+  font-family: var(--font);
+  animation: pageEnter 0.35s ease-out;
 }
 
-.back-link {
+.course-detail-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Back link */
+.detail-back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #94a3b8;
-  text-decoration: none;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
   font-weight: 500;
-  margin-bottom: 30px;
-  transition: color 0.3s;
+  padding: 20px 0 0;
+  transition: color 0.2s;
 }
 
-.back-link:hover {
-  color: #f8fafc;
+.detail-back:hover {
+  color: var(--primary);
 }
 
-.course-detail-content {
-  max-width: 1000px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
+/* Hero ảnh bìa */
+.detail-hero {
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.course-detail-hero {
+  margin: 16px 0 32px;
   position: relative;
-  height: 400px;
+  height: 340px;
+  box-shadow: var(--shadow-md);
 }
 
-.course-hero-image {
+.detail-hero-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.course-hero-overlay {
+.detail-hero-overlay {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: linear-gradient(to top, #0a0c14 0%, rgba(10, 12, 20, 0.2) 100%);
-  display: flex;
-  align-items: flex-end;
-  padding: 40px;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
 }
 
-.course-detail-body {
-  padding: 40px;
+/* Layout 2 cột */
+.detail-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+  padding-bottom: 60px;
 }
 
-.course-detail-main h1 {
-  font-size: 2.5rem;
+/* Main content */
+.detail-main h1 {
+  font-size: 1.8rem;
   font-weight: 800;
-  margin-bottom: 16px;
-  color: #f8fafc;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.detail-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .detail-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
   font-weight: 600;
-  margin-bottom: 24px;
-  margin-right: 12px;
 }
 
-.course-description {
-  font-size: 1.1rem;
-  color: #cbd5e1;
-  line-height: 1.7;
+.detail-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  white-space: pre-line;
+  margin-bottom: 28px;
+}
+
+.detail-section {
+  margin-bottom: 28px;
+}
+
+.detail-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-section p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
   white-space: pre-line;
 }
 
-.course-sidebar {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 30px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  height: fit-content;
+/* Sidebar thông tin khóa học */
+.detail-sidebar {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 20px;
+  animation: scaleIn 0.3s ease;
+}
+
+.detail-sidebar-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.detail-sidebar-body {
+  padding: 24px;
 }
 
 .sidebar-price {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
-  color: #f8fafc;
-  margin-bottom: 24px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
 }
 
-.sidebar-info-row {
+.sidebar-price-old {
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.sidebar-meta {
   display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.sidebar-meta-row {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.875rem;
 }
 
-.sidebar-info-row span:last-child {
-  color: #f8fafc;
-  font-weight: 500;
+.sidebar-meta-row:last-child {
+  border-bottom: none;
 }
 
+.sidebar-meta-row .label {
+  color: var(--text-secondary);
+}
+
+.sidebar-meta-row .value {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Nút đăng ký */
 .enroll-btn {
   width: 100%;
-  padding: 16px;
-  margin-top: 30px;
-  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  padding: 14px;
+  background: var(--gradient-primary);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+  transition: all 0.25s ease;
+  font-family: var(--font);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  margin-top: 16px;
 }
 
 .enroll-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
+.enroll-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ================================================================
+   10. TABS & LMS CURRICULUM
+================================================================ */
+.course-tabs-nav {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  margin-top: 32px;
+}
+
+.tab-nav-btn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 12px 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-nav-btn:hover {
+  color: var(--primary);
+}
+
+.tab-nav-btn.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.tab-nav-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+}
+
+.tab-pane {
+  background: transparent;
+}
+
+.animate-fade {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Accordion */
+.curriculum-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.accordion-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.accordion-header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: background 0.2s;
+}
+
+.accordion-header:hover {
+  background: #f1f5f9;
+}
+
+.accordion-item.expanded .accordion-header {
+  background: #eff6ff;
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-body {
+  padding: 0;
+  background: #fff;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-item:hover {
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.lesson-title {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.lesson-icon {
+  font-size: 1rem;
+}
+
+.lesson-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lesson-duration {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.preview-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.locked-icon {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* Resources */
+.unlocked-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.resource-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-color: #bfdbfe;
+}
+
+/* ================================================================
+   8. RESPONSIVE
+================================================================ */
 @media (max-width: 900px) {
-  .course-detail-body {
+  .detail-layout {
     grid-template-columns: 1fr;
+  }
+
+  .detail-sidebar {
+    position: static;
+    order: -1;
+  }
+
+  .courses-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px 32px;
+  }
+
+  .courses-header {
+    padding: 40px 16px 28px;
+  }
+
+  .category-filters {
+    padding: 16px;
+    gap: 6px;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    font-size: 0.78rem;
+  }
+
+  .detail-hero {
+    height: 220px;
   }
 }
