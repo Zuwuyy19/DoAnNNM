@@ -104,6 +104,8 @@ export default function CourseDetail() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") return;
+
 
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
@@ -137,6 +139,11 @@ export default function CourseDetail() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") {
+      navigate(`/learning/${course.slug}`);
+      return;
+    }
+
 
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];

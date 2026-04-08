@@ -1,4 +1,4 @@
-﻿// ================================================
+// ================================================
 // CONTROLLER: Order - Quản lý đơn hàng
 // Mô tả: Tạo đơn hàng, xử lý thanh toán, xem lịch sử mua hàng
 // ================================================
@@ -503,6 +503,11 @@ exports.vnpayReturn = async (req, res) => {
         data: { orderId: order._id, orderNumber }
       });
     } else {
+      // THANH TOÁN THẤT BẠI HOẶC BỊ HỦY
+      order.paymentStatus = "failed";
+      order.orderStatus = "failed";
+      await order.save();
+
       return res.json({
         success: false,
         message: "Thanh toán bị hủy hoặc có lỗi xảy ra",
@@ -570,6 +575,7 @@ exports.vnpayIPN = async (req, res) => {
     } else {
       // THANH TOÁN THẤT BẠI
       order.paymentStatus = "failed";
+      order.orderStatus = "failed";
       await order.save();
       return res.status(200).json({ RspCode: "00", Message: "Success (Payment Failed)" });
     }

@@ -3,7 +3,7 @@
 // Mô tả: Xem danh sách đơn hàng, cập nhật trạng thái thanh toán
 // ================================================
 import { useState, useEffect } from "react";
-import { getAllOrders, updateOrderStatus } from "../../services/orderService";
+import { getAllOrders } from "../../services/orderService";
 import AdminLayout from "../../components/AdminLayout";
 import Icon from "../../components/Icon";
 
@@ -13,7 +13,6 @@ export default function AdminOrders() {
   // ================================================
   const [orders, setOrders] = useState([]);       // Danh sách đơn hàng
   const [loading, setLoading] = useState(true);  // Loading khi tải dữ liệu
-  const [processing, setProcessing] = useState(null); // ID đơn đang xử lý
 
   // ================================================
   // STATE BỘ LỌC
@@ -58,27 +57,7 @@ export default function AdminOrders() {
     setTimeout(() => setMessage({ type: "", text: "" }), 4000);
   };
 
-  // ================================================
-  // HÀM: Cập nhật trạng thái thanh toán đơn hàng
-  // ================================================
-  const handleUpdateStatus = async (orderId, paymentStatus) => {
-    setProcessing(orderId);
-    try {
-      const res = await updateOrderStatus(orderId, { paymentStatus });
-      if (res.data.success) {
-        showMessage("success", "Cập nhật trạng thái thành công!");
-        // Cập nhật state mà không gọi API lại
-        setOrders((prev) =>
-          prev.map((o) => (o._id === orderId ? { ...o, paymentStatus } : o))
-        );
-      }
-    } catch (err) {
-      showMessage("error", err.response?.data?.message || "Lỗi cập nhật trạng thái");
-      fetchOrders(); // Khôi phục lại danh sách nếu lỗi
-    } finally {
-      setProcessing(null);
-    }
-  };
+
 
   // ================================================
   // HÀM: Map trạng thái -> Badge
@@ -212,7 +191,6 @@ export default function AdminOrders() {
                 <th>Thanh toán</th>
                 <th>Trạng thái</th>
                 <th>Ngày tạo</th>
-                <th style={{ width: "160px" }}>Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -298,27 +276,13 @@ export default function AdminOrders() {
                     </div>
                   </td>
 
-                  {/* Hành động: Select đổi trạng thái */}
-                  <td>
-                    <select
-                      className="admin-table-filter-select"
-                      value={order.paymentStatus}
-                      onChange={(e) => handleUpdateStatus(order._id, e.target.value)}
-                      disabled={processing === order._id}
-                      style={{ minWidth: "140px", fontSize: "0.8rem" }}
-                    >
-                      <option value="pending">Chờ xử lý</option>
-                      <option value="paid">Đã thanh toán</option>
-                      <option value="failed">Thất bại</option>
-                      <option value="refunded">Hoàn tiền</option>
-                    </select>
-                  </td>
+
                 </tr>
               ))}
 
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="admin-empty-cell">
+                  <td colSpan="7" className="admin-empty-cell">
                     Chưa có đơn hàng nào
                   </td>
                 </tr>
