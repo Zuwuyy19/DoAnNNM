@@ -1,4 +1,4 @@
-// ================================================
+﻿// ================================================
 // CONTROLLER: Order - Quản lý đơn hàng
 // Mô tả: Tạo đơn hàng, xử lý thanh toán, xem lịch sử mua hàng
 // ================================================
@@ -6,6 +6,82 @@ const Order = require("../models/Order");
 const Course = require("../models/Course");
 const User = require("../models/User");
 const Coupon = require("../models/Coupon");
+
+const getPaidCouponUsageByUser = async (userId, couponCode) => {
+  if (!couponCode) return 0;
+
+  return Order.countDocuments({
+    user: userId,
+    couponCode,
+    paymentStatus: "paid",
+  });
+};
+
+const validateCouponForCheckout = async ({ coupon, userId }) => {
+  if (!coupon) {
+    return {
+      valid: false,
+      message: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+    };
+  }
+
+  const now = new Date();
+
+  if (coupon.startDate && now < new Date(coupon.startDate)) {
+    return {
+      valid: false,
+      message: "Mã giảm giá chưa đến thời gian sử dụng",
+    };
+  }
+
+  if (coupon.endDate && now > new Date(coupon.endDate)) {
+    return {
+      valid: false,
+      message: "Mã giảm giá đã hết hạn",
+    };
+  }
+
+  if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+    return {
+      valid: false,
+      message: "Mã giảm giá đã hết lượt sử dụng",
+    };
+  }
+
+  if (coupon.maxUsagePerUser) {
+    const userUsageCount = await getPaidCouponUsageByUser(userId, coupon.code);
+    if (userUsageCount >= coupon.maxUsagePerUser) {
+      return {
+        valid: false,
+        message: "Bạn đã dùng hết số lần sử dụng mã giảm giá này",
+      };
+    }
+  }
+
+  return { valid: true };
+};
+
+const incrementCouponUsage = async (couponCode) => {
+  if (!couponCode) return;
+
+  const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+  if (!coupon) return;
+
+  const filter = { _id: coupon._id };
+  if (coupon.usageLimit) {
+    filter.usedCount = { $lt: coupon.usageLimit };
+  }
+
+  const updatedCoupon = await Coupon.findOneAndUpdate(
+    filter,
+    { $inc: { usedCount: 1 } },
+    { new: true }
+  );
+
+  if (!updatedCoupon) {
+    throw new Error("Mã giảm giá đã hết lượt sử dụng");
+  }
+};
 
 // ================================================
 // FEATURE 25: Tạo đơn hàng mới (User)
@@ -74,26 +150,15 @@ exports.createOrder = async (req, res) => {
         isActive: true,
       });
 
-      if (!coupon) {
-        return res.status(400).json({
-          success: false,
-          message: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
-        });
-      }
+      const couponValidation = await validateCouponForCheckout({
+        coupon,
+        userId: req.user.id,
+      });
 
-      // Kiểm tra thời hạn
-      if (new Date() > new Date(coupon.endDate)) {
+      if (!couponValidation.valid) {
         return res.status(400).json({
           success: false,
-          message: "Mã giảm giá đã hết hạn",
-        });
-      }
-
-      // Kiểm tra số lượng sử dụng
-      if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-        return res.status(400).json({
-          success: false,
-          message: "Mã giảm giá đã hết lượt sử dụng",
+          message: couponValidation.message,
         });
       }
 
@@ -302,12 +367,16 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
+    const previousPaymentStatus = order.paymentStatus;
+
     // Cập nhật trạng thái
     if (orderStatus) order.orderStatus = orderStatus;
     if (paymentStatus) order.paymentStatus = paymentStatus;
 
     // Nếu thanh toán thành công -> cấp quyền học
-    if (paymentStatus === "paid" && order.paymentStatus !== "paid") {
+    if (paymentStatus === "paid" && previousPaymentStatus !== "paid") {
+      await incrementCouponUsage(order.couponCode);
+
       const user = await User.findById(order.user);
       for (const item of order.items) {
         if (!user.enrolledCourses.includes(item.course)) {
@@ -348,24 +417,15 @@ exports.applyCoupon = async (req, res) => {
       isActive: true,
     });
 
-    if (!coupon) {
-      return res.status(400).json({
-        success: false,
-        message: "Mã giảm giá không tồn tại",
-      });
-    }
+    const couponValidation = await validateCouponForCheckout({
+      coupon,
+      userId: req.user.id,
+    });
 
-    if (new Date() > new Date(coupon.endDate)) {
+    if (!couponValidation.valid) {
       return res.status(400).json({
         success: false,
-        message: "Mã giảm giá đã hết hạn",
-      });
-    }
-
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-      return res.status(400).json({
-        success: false,
-        message: "Mã giảm giá đã hết lượt sử dụng",
+        message: couponValidation.message,
       });
     }
 
@@ -418,6 +478,8 @@ exports.vnpayReturn = async (req, res) => {
     if (responseCode === "00") {
       // THANH TOÁN THÀNH CÔNG -> CẤP QUYỀN TRUY CẬP NGAY
       if (order.paymentStatus !== "paid") {
+        await incrementCouponUsage(order.couponCode);
+
         order.paymentStatus = "paid";
         order.orderStatus = "completed"; // Chuyển từ processing -> completed ngay
         order.transactionId = vnp_Params["vnp_TransactionNo"];
@@ -487,6 +549,8 @@ exports.vnpayIPN = async (req, res) => {
 
     if (responseCode === "00") {
       // THANH TOÁN THÀNH CÔNG
+      await incrementCouponUsage(order.couponCode);
+
       order.paymentStatus = "paid";
       order.orderStatus = "completed";
       order.transactionId = vnp_Params["vnp_TransactionNo"];
