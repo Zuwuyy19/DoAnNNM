@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 // Khởi tạo middleware multer (cho phép mọi loại file hoặc giới hạn tùy chọn)
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // Giới hạn 50MB
+  limits: { fileSize: 500 * 1024 * 1024 }, // Giới hạn 500MB cho video
 }).single("file"); // "file" là tên thẻ input gửi lên
 
 // ================================================
@@ -47,8 +47,7 @@ exports.uploadFile = (req, res) => {
     }
 
     // Trả về url của file
-    // Sử dụng địa chỉ gốc của server. Ở môi trường dev là localhost:5000
-    const fileUrl = `${process.env.SERVER_URL || "http://localhost:5000"}/uploads/${req.file.filename}`;
+    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
 
     res.status(200).json({
       success: true,

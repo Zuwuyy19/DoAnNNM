@@ -41,7 +41,6 @@ export default function AdminCourses() {
     status: "draft",     // Trạng thái: draft / published / archived
     tags: "",            // Tags: cách nhau bằng dấu phẩy
     prerequisites: "",   // Yêu cầu trước khi học
-    prerequisites: "",   // Yêu cầu trước khi học
     whatYouLearn: "",    // Học được gì sau khóa học
     instructor: "",      // ID giảng viên
     authorName: "",      // Tên giảng viên hiển thị

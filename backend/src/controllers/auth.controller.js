@@ -470,3 +470,41 @@ exports.toggleUserStatus = async (req, res) => {
     });
   }
 };
+// ================================================
+// FEATURE 11: Xóa người dùng (Admin only)
+// Input: userId từ URL params
+// Output: Xác nhận xóa thành công
+// ================================================
+exports.deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Ngăn chặn admin tự xóa chính mình
+    if (userId === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: "Bạn không thể tự xóa tài khoản của chính mình",
+      });
+    }
+
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Đã xóa người dùng thành công",
+    });
+  } catch (error) {
+    console.error("Lỗi xóa người dùng:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+    });
+  }
+};

@@ -1,4 +1,4 @@
-﻿// ================================================
+// ================================================
 // APP.JSX - Component chinh cua ung dung React
 // ================================================
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
 import MyLearning from "./pages/MyLearning";
 import MyTeaching from "./pages/MyTeaching";
+import PaymentResult from "./pages/PaymentResult";
 import Wishlist from "./pages/Wishlist";
 import MyOrders from "./pages/MyOrders";
 
@@ -61,7 +62,11 @@ function AppContent() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="/my-learning" element={<ProtectedRoute><MyLearning /></ProtectedRoute>} />
-          <Route path="/my-teaching" element={<ProtectedRoute><MyTeaching /></ProtectedRoute>} />
+          {/* VNPay Result */}
+          <Route path="/payment-result" element={<ProtectedRoute><PaymentResult /></ProtectedRoute>} />
+
+          {/* Teacher Routes */}
+          <Route path="/my-teaching" element={<TeacherRoute><MyTeaching /></TeacherRoute>} />
           <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
           <Route path="/learning/:slug" element={<ProtectedRoute><Learning /></ProtectedRoute>} />
           <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />

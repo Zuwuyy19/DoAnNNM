@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Icon from "./Icon";
+import api from "../services/api";
 
 export default function CurriculumEditor({ curriculum = [], onChange }) {
+  const [uploading, setUploading] = useState(null); // { sIdx, lIdx } của bài đang upload
+
   // ================================================
   // QUẢN LÝ CHƯƠNG (SECTION)
   // ================================================
@@ -15,8 +18,9 @@ export default function CurriculumEditor({ curriculum = [], onChange }) {
   };
 
   const updateSectionTitle = (sIdx, newTitle) => {
-    const updated = [...curriculum];
-    updated[sIdx].title = newTitle;
+    const updated = curriculum.map((section, idx) => 
+      idx === sIdx ? { ...section, title: newTitle } : section
+    );
     onChange(updated);
   };
 
@@ -30,31 +34,81 @@ export default function CurriculumEditor({ curriculum = [], onChange }) {
   // QUẢN LÝ BÀI HỌC (LESSON)
   // ================================================
   const addLesson = (sIdx) => {
-    const updated = [...curriculum];
-    updated[sIdx].lessons.push({
-      title: "Bài học mới",
-      duration: 0,
-      isFreePreview: false,
-      videoUrl: "",
-      order: updated[sIdx].lessons.length + 1,
+    const updated = curriculum.map((section, idx) => {
+      if (idx !== sIdx) return section;
+      return {
+        ...section,
+        lessons: [
+          ...section.lessons,
+          {
+            title: "Bài học mới",
+            duration: 0,
+            isFreePreview: false,
+            videoUrl: "",
+            order: section.lessons.length + 1,
+          }
+        ]
+      };
     });
     onChange(updated);
   };
 
   const updateLesson = (sIdx, lIdx, key, value) => {
-    const updated = [...curriculum];
-    updated[sIdx].lessons[lIdx] = {
-      ...updated[sIdx].lessons[lIdx],
-      [key]: value,
-    };
+    const updated = curriculum.map((section, si) => {
+      if (si !== sIdx) return section;
+      const updatedLessons = section.lessons.map((lesson, li) => {
+        if (li !== lIdx) return lesson;
+        return { ...lesson, [key]: value };
+      });
+      return { ...section, lessons: updatedLessons };
+    });
     onChange(updated);
   };
 
   const removeLesson = (sIdx, lIdx) => {
     if (!window.confirm("Xóa bài học này?")) return;
-    const updated = [...curriculum];
-    updated[sIdx].lessons = updated[sIdx].lessons.filter((_, idx) => idx !== lIdx);
+    const updated = curriculum.map((section, si) => {
+      if (si !== sIdx) return section;
+      return {
+        ...section,
+        lessons: section.lessons.filter((_, li) => li !== lIdx)
+      };
+    });
     onChange(updated);
+  };
+
+  // ================================================
+  // XỬ LÝ UPLOAD VIDEO
+  // ================================================
+  const handleVideoUpload = async (sIdx, lIdx, file) => {
+    if (!file) return;
+
+    // Kiểm tra định dạng (chỉ chấp nhận video)
+    if (!file.type.startsWith("video/")) {
+      alert("Vui lòng chọn file video hợp lệ (mp4, webm,...)");
+      return;
+    }
+
+    setUploading({ sIdx, lIdx });
+    
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await api.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        // Có thể thêm onUploadProgress ở đây nếu muốn hiện %
+      });
+
+      if (res.data.success) {
+        updateLesson(sIdx, lIdx, "videoUrl", res.data.data.url);
+      }
+    } catch (err) {
+      console.error("Lỗi upload video:", err);
+      alert(err.response?.data?.message || "Lỗi khi tải video lên. Vui lòng thử lại.");
+    } finally {
+      setUploading(null);
+    }
   };
 
   return (
@@ -99,9 +153,9 @@ export default function CurriculumEditor({ curriculum = [], onChange }) {
                 {section.lessons && section.lessons.length > 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
                     {section.lessons.map((lesson, lIdx) => (
-                      <div key={lIdx} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "6px", background: "#fafafa" }}>
+                      <div key={lIdx} style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "12px", border: "1px solid #e2e8f0", borderRadius: "6px", background: "#fafafa" }}>
                         
-                        <div style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                           <span style={{ fontSize: "0.85rem", fontWeight: "600", color: "var(--admin-text-secondary)" }}>Bài {lIdx + 1}</span>
                           <input
                             type="text"
@@ -115,7 +169,7 @@ export default function CurriculumEditor({ curriculum = [], onChange }) {
                           </button>
                         </div>
                         
-                        <div style={{ width: "100%", display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
+                        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                             <label style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", fontWeight: "500" }}>Thời lượng (phút):</label>
                             <input
@@ -135,18 +189,42 @@ export default function CurriculumEditor({ curriculum = [], onChange }) {
                               onChange={(e) => updateLesson(sIdx, lIdx, "isFreePreview", e.target.checked)}
                               style={{ cursor: "pointer" }}
                             />
-                            <label htmlFor={`free-preview-${sIdx}-${lIdx}`} style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", cursor: "pointer", fontWeight: "500" }}>Cho phép học thử (Free Preview)</label>
+                            <label htmlFor={`free-preview-${sIdx}-${lIdx}`} style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", cursor: "pointer", fontWeight: "500" }}>Cho phép học thử</label>
                           </div>
 
-                          <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "6px", minWidth: "200px" }}>
-                            <label style={{ fontSize: "0.8rem", color: "var(--admin-text-secondary)", fontWeight: "500" }}>Video URL:</label>
-                            <input
-                              type="text"
-                              value={lesson.videoUrl || ""}
-                              onChange={(e) => updateLesson(sIdx, lIdx, "videoUrl", e.target.value)}
-                              placeholder="https://..."
-                              style={{ flex: 1, padding: "4px 8px", border: "1px solid var(--admin-border)", borderRadius: "4px", fontSize: "0.85rem" }}
-                            />
+                          <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "8px", minWidth: "250px" }}>
+                            <div style={{ flex: 1, position: "relative" }}>
+                              <input
+                                type="text"
+                                value={lesson.videoUrl || ""}
+                                onChange={(e) => updateLesson(sIdx, lIdx, "videoUrl", e.target.value)}
+                                placeholder="Dán link video hoặc tải lên từ máy..."
+                                style={{ width: "100%", padding: "6px 10px", border: "1px solid var(--admin-border)", borderRadius: "4px", fontSize: "0.85rem" }}
+                              />
+                            </div>
+                            
+                            <label className={`btn btn-sm ${uploading?.sIdx === sIdx && uploading?.lIdx === lIdx ? 'disabled' : ''}`} style={{ 
+                              cursor: "pointer", 
+                              backgroundColor: "var(--admin-primary)", 
+                              color: "white", 
+                              border: "none",
+                              padding: "6px 12px",
+                              borderRadius: "4px",
+                              fontSize: "0.8rem",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px"
+                            }}>
+                              <Icon name={uploading?.sIdx === sIdx && uploading?.lIdx === lIdx ? "clock" : "star"} size={14} />
+                              {uploading?.sIdx === sIdx && uploading?.lIdx === lIdx ? "Đang tải..." : "Tải lên"}
+                              <input 
+                                type="file" 
+                                accept="video/*" 
+                                style={{ display: "none" }} 
+                                disabled={uploading !== null}
+                                onChange={(e) => handleVideoUpload(sIdx, lIdx, e.target.files[0])}
+                              />
+                            </label>
                           </div>
                         </div>
 
