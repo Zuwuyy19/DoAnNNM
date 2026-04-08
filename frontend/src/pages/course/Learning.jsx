@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getCourseBySlug, getMyEnrolledCourses } from "../../services/courseService";
 import { getUser } from "../../services/authService";
+import { getUserProgress, toggleLessonProgress } from "../../services/progressService";
 import Icon from "../../components/Icon";
 
 export default function Learning() {
@@ -32,13 +33,6 @@ export default function Learning() {
 
   useEffect(() => {
     fetchCourseAndEnrollment();
-    // Load tiến độ học từ trình duyệt (localStorage) theo từng USER
-    if (user?.id) {
-      const savedProgress = localStorage.getItem(`progress_${user.id}_${slug}`);
-      if (savedProgress) {
-        setProgress(new Set(JSON.parse(savedProgress)));
-      }
-    }
   }, [slug]);
 
   const fetchCourseAndEnrollment = async () => {
@@ -78,8 +72,17 @@ export default function Learning() {
           ...firstLesson,
           chapterIndex: 0,
           lessonIndex: 0,
-          actualId: firstLesson._id || firstLesson.id || firstLesson.title
         });
+
+        // Tải tiến độ từ BACKEND
+        try {
+          const progressRes = await getUserProgress(loadedCourse._id);
+          if (progressRes.data.success && progressRes.data.data) {
+            setProgress(new Set(progressRes.data.data.completedLessons));
+          }
+        } catch (progErr) {
+          console.error("Lỗi tải tiến độ từ server:", progErr);
+        }
       }
 
     } catch (err) {
@@ -89,7 +92,10 @@ export default function Learning() {
     }
   };
 
-  const handleToggleComplete = (lessonId) => {
+  const handleToggleComplete = async (lessonId) => {
+    if (!course?._id) return;
+
+    // Optimistic UI update
     const newProgress = new Set(progress);
     if (newProgress.has(lessonId)) {
       newProgress.delete(lessonId);
@@ -97,8 +103,13 @@ export default function Learning() {
       newProgress.add(lessonId);
     }
     setProgress(newProgress);
-    if (user?.id) {
-      localStorage.setItem(`progress_${user.id}_${slug}`, JSON.stringify([...newProgress]));
+
+    // Sync to Backend
+    try {
+      await toggleLessonProgress(course._id, lessonId);
+    } catch (err) {
+      console.error("Lỗi đồng bộ tiến độ:", err);
+      // Rollback nếu cần (tùy UX, ở đây tôi chỉ log)
     }
   };
 

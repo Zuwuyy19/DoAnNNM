@@ -52,6 +52,9 @@ const couponRoutes = require("./routes/coupon.routes");
 // API Upload file
 const uploadRoutes = require("./routes/upload.routes");
 
+// API Tiến độ học tập
+const progressRoutes = require("./routes/progress.routes");
+
 // Gắn prefix /api cho tất cả routes
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -59,6 +62,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/progress", progressRoutes);
 
 // ================================================
 // API HEALTH CHECK: Kiểm tra server đang chạy

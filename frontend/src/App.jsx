@@ -17,6 +17,7 @@ import MyTeaching from "./pages/MyTeaching";
 import PaymentResult from "./pages/PaymentResult";
 import Wishlist from "./pages/Wishlist";
 import MyOrders from "./pages/MyOrders";
+import StudentProgress from "./pages/teacher/StudentProgress";
 
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminCourses from "./pages/admin/Courses";
@@ -73,6 +74,7 @@ function AppContent() {
 
           <Route path="/teacher" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
           <Route path="/teacher/courses" element={<TeacherRoute><TeacherCourses /></TeacherRoute>} />
+          <Route path="/teacher/courses/:courseId/progress" element={<TeacherRoute><StudentProgress /></TeacherRoute>} />
 
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/courses" element={<AdminRoute><AdminCourses /></AdminRoute>} />

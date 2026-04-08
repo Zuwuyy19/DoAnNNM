@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import TeacherLayout from "../../components/TeacherLayout";
 import Icon from "../../components/Icon";
@@ -100,9 +100,19 @@ export default function TeacherCourses() {
                       </span>
                     </td>
                     <td>
-                      <Link to={`/courses/${course.slug}`} className="teacher-detail-btn">
-                        Xem chi tiết
-                      </Link>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <Link to={`/courses/${course.slug}`} className="teacher-detail-btn">
+                          Xem chi tiết
+                        </Link>
+                        <Link 
+                          to={`/teacher/courses/${course._id}/progress`} 
+                          className="teacher-detail-btn"
+                          style={{ background: "rgba(59, 130, 246, 0.1)", color: "#2563eb", borderColor: "#bfdbfe" }}
+                        >
+                          <Icon name="star" size={14} />
+                          Xem tiến độ
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
