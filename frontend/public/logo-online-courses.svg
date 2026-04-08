@@ -1,0 +1,23 @@
+<svg width="240" height="64" viewBox="0 0 240 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="38" y1="38" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="48" height="48" rx="12" fill="url(#g1)"/>
+  <path d="M20 21C17.8 21 16 22.8 16 25V40C16 42.2 17.8 44 20 44H28C30.8 44 33 46.2 33 49C33 46.2 35.2 44 38 44H44C46.2 44 48 42.2 48 40V25C48 22.8 46.2 21 44 21H38C35.8 21 33.9 22.1 33 23.9C32.1 22.1 30.2 21 28 21H20Z" fill="white" fill-opacity="0.95"/>
+
+  <circle cx="46" cy="46" r="8" fill="url(#g2)" stroke="white" stroke-width="2"/>
+  <path d="M42.5 44H43.5L44.2 47H47.8L48.3 44.9H44.2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="44.7" cy="48.6" r="0.9" fill="white"/>
+  <circle cx="47" cy="48.6" r="0.9" fill="white"/>
+
+  <text x="68" y="31" fill="#0F172A" font-size="18" font-family="Arial, sans-serif" font-weight="700">Online Courses</text>
+  <text x="68" y="46" fill="#64748B" font-size="10" font-family="Arial, sans-serif" font-weight="600">LEARN • SHOP • GROW</text>
+</svg>

@@ -1,9 +1,9 @@
+// ================================================
+// SERVICE: authService.js - Các hàm gọi API xác thực
+// Mô tả: Đăng nhập, đăng ký, quản lý token, profile, đổi mật khẩu
+// ================================================
 import api from "./api";
 
-<<<<<<< Updated upstream
-export const login = (data) => api.post("/auth/login", data);
-export const register = (data) => api.post("/auth/register", data);
-=======
 // ================================================
 // Lưu token vào localStorage
 // Key: "token" - Lưu JWT token nhận được từ server
@@ -150,4 +150,3 @@ export const logout = () => {
   clearAuth();
   window.location.href = "/login";
 };
->>>>>>> Stashed changes

@@ -1,266 +1,171 @@
-/* =========================================
-   1. BIẾN MÀU & RESET TỔNG THỂ
-========================================= */
-/* Đảm bảo reset toàn bộ lề của trang và ép full màn hình */
-html, body, #root {
-  margin: 0;
-  padding: 0;
+/* ================================================================
+   AUTH PAGES - ĐĂNG NHẬP / ĐĂNG KÝ
+   Giao diện sáng, chuyên nghiệp
+================================================================ */
+
+/* ================================================================
+   1. AUTH PAGE CONTAINER
+================================================================ */
+.auth-page {
+  min-height: 100vh;
   width: 100%;
-  height: 100%;
-  background-color: var(--bg-primary); /* Đổ màu nền đen cho cả body dự phòng */
-  overflow-x: hidden; /* Chống cuộn ngang làm lòi viền trắng */
-}
-
-/* Cập nhật lại class auth-page để nó chiếm trọn width */
-.auth-page {
-  min-height: 100vh;
-  width: 100vw; /* Thêm dòng này để ép rộng 100% viewport */
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  background-color: var(--bg-primary); 
+  background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 50%, #fdf2f8 100%);
   color: var(--text-primary);
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow: hidden;
-  padding: 20px;
-}
-:root {
-  --bg-primary: #0a0c14;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --primary-color: #6366f1;
-  --secondary-color: #ec4899;
-  --gradient-1: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
-  
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* =========================================
-   2. BỐ CỤC TRANG CHÍNH (AUTH PAGE)
-========================================= */
-.auth-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background-color: var(--bg-primary); /* Nền tối */
-  color: var(--text-primary);
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
   overflow: hidden;
   padding: 20px;
 }
 
-/* =========================================
-   3. HIỆU ỨNG ÁNH SÁNG (GLOWS)
-========================================= */
-.glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  z-index: 1;
-  opacity: 0.5;
-}
-
-.glow-1 {
-  background: rgba(99, 102, 241, 0.5); /* Tím xanh */
-  width: 400px;
-  height: 400px;
-  top: -10%;
-  left: -5%;
-}
-
-.glow-2 {
-  background: rgba(236, 72, 153, 0.4); /* Hồng */
-  width: 500px;
-  height: 500px;
-  bottom: -10%;
-  right: -10%;
-}
-
-/* =========================================
-   4. THẺ ĐĂNG NHẬP (GLASS PANEL)
-========================================= */
+/* ================================================================
+   2. GLASS CARD - THẺ ĐĂNG NHẬP
+================================================================ */
 .auth-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   padding: 48px 40px;
   text-align: center;
   z-index: 2;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.3s ease;
 }
 
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: var(--glass-shadow);
-}
-
-/* =========================================
-   5. TIÊU ĐỀ & TYPOGRAPHY
-========================================= */
+/* ================================================================
+   3. HEADER - TIÊU ĐỀ
+================================================================ */
 .auth-header {
   margin-bottom: 32px;
 }
 
-.text-gradient {
-  background: var(--gradient-1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 2.2rem;
-  font-weight: 700;
+.auth-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .auth-header p {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-/* =========================================
-   6. FORM & Ô NHẬP LIỆU (INPUTS)
-========================================= */
+/* ================================================================
+   4. FORM INPUTS - Ô NHẬP LIỆU
+================================================================ */
 .auth-card form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .input-group {
   position: relative;
   width: 100%;
+  text-align: left;
 }
 
-.input-group i {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
+.input-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  margin-bottom: 6px;
 }
 
-.input-group input {
+.input-group input,
+.input-group textarea {
   width: 100%;
-  padding: 14px 14px 14px 45px;
-  border-radius: 10px;
-  border: 1px solid var(--glass-border);
-  background: rgba(0, 0, 0, 0.2);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: white;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-family: var(--font);
   outline: none;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
-.input-group input:focus {
-  border-color: var(--primary-color);
-  background: rgba(0, 0, 0, 0.4);
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* =========================================
-   7. NÚT BẤM & ĐƯỜNG DẪN (BUTTONS & LINKS)
-========================================= */
+.input-group input:disabled {
+  background: var(--bg-gray-100);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.input-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ================================================================
+   5. FORGOT PASSWORD LINK
+================================================================ */
 .auth-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: -8px;
+  margin-top: -4px;
 }
 
 .forgot-link {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.8rem;
+  color: var(--primary);
   text-decoration: none;
-  transition: color 0.3s ease;
+  font-weight: 500;
 }
 
 .forgot-link:hover {
-  color: var(--primary-color);
+  color: var(--primary-hover);
+  text-decoration: underline;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  border: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* ================================================================
+   6. AUTH BUTTON - NÚT ĐĂNG NHẬP
+================================================================ */
+.auth-btn {
+  margin-top: 4px;
 }
 
-.btn-primary {
-  background: var(--gradient-1);
-  color: white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-}
-
+/* ================================================================
+   7. AUTH FOOTER - LINK ĐĂNG KÝ
+================================================================ */
 .auth-footer {
-  margin-top: 25px;
+  margin-top: 24px;
   color: var(--text-secondary);
-  font-size: 0.95rem;
-}
-
-.auth-footer a {
-  color: var(--primary-color);
-  font-weight: 600;
-  text-decoration: none;
-  margin-left: 5px;
-  transition: color 0.3s ease;
-}
-
-.auth-footer a:hover {
-  color: var(--secondary-color);
-}
-.auth-footer {
-  margin-top: 25px; /* Khoảng cách phía trên */
-  color: #94a3b8; /* Màu chữ xám phụ */
-  font-size: 0.95rem; /* Kích thước phông chữ tổng thể của dòng */
-  
-  /* Căn giữa và ép nằm trên 1 hàng */
+  font-size: 0.875rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px; /* Khoảng cách nhỏ giữa chữ và liên kết */
+  gap: 4px;
 }
 
-/* KHÓA KÍCH THƯỚC PHÔNG CHỮ CHO LIÊN KẾT ĐĂNG KÝ */
 .auth-footer a {
-  /* Ép kích thước phông chữ nhỏ lại, 
-     Ví dụ dùng 1rem hoặc nhỏ hơn một chút (0.95rem) */
-  font-size: 0.95rem !important; /* Dùng !important nếu cần ép phông chữ */
-  
-  font-weight: 600; /* Làm đậm chữ lên */
-  text-decoration: none; /* Bỏ gạch chân nếu có */
-  transition: color 0.3s ease; /* Hiệu ứng đổi màu khi hover */
-  
-  /* Đảm bảo liên kết không bị to ra do class .text-gradient */
-  background: var(--gradient-1); /* Hoặc màu gradient bạn đang dùng */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .auth-footer a:hover {
-  color: #ec4899; /* Màu khi di chuột qua */
-  -webkit-text-fill-color: #ec4899; /* Hiệu ứng hover cho text-gradient */
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* ================================================================
+   8. RESPONSIVE
+================================================================ */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 32px 24px;
+  }
 }

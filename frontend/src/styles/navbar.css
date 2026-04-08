@@ -1,0 +1,553 @@
+/* ================================================================
+   NAVBAR - THANH ĐIỀU HƯỚNG DÙNG CHUNG (MỌI TRANG)
+   Theme sáng, sticky, chuyên nghiệp, animation mượt
+================================================================ */
+
+/* ================================================================
+   1. NAVBAR CONTAINER
+================================================================ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* ================================================================
+   2. LOGO
+================================================================ */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1e293b;
+  flex-shrink: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.navbar-logo:hover {
+  opacity: 0.85;
+}
+
+.navbar-logo-image {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+
+/* ================================================================
+   3. NAV LINKS - MENU ĐIỀU HƯỚNG
+   Active state với underline animation
+================================================================ */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+  /* Xóa underline mặc định của thẻ a */
+  text-decoration: none;
+}
+
+/* Hover state */
+.nav-link:hover {
+  color: #1e293b;
+  background-color: #f1f5f9;
+}
+
+/* Active state - underline animation */
+.nav-link.active {
+  color: #3b82f6;
+  background-color: #eff6ff;
+  font-weight: 600;
+}
+
+/* Animated underline for active state */
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 2px;
+  animation: underlineGrow 0.3s ease;
+}
+
+@keyframes underlineGrow {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 20px;
+    opacity: 1;
+  }
+}
+
+/* Admin link - purple accent */
+.nav-link-admin {
+  color: #8b5cf6 !important;
+}
+
+.nav-link-admin:hover {
+  background: #f5f3ff !important;
+  color: #7c3aed !important;
+}
+
+/* ================================================================
+   4. NAVBAR ACTIONS - NÚT BÊN PHẢI
+================================================================ */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.user-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ================================================================
+   5. USER DROPDOWN
+================================================================ */
+.user-dropdown {
+  position: relative;
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.user-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* User avatar */
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-arrow {
+  font-size: 0.6rem;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+/* ================================================================
+   6. DROPDOWN MENU
+================================================================ */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  overflow: hidden;
+  animation: dropdownIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 100;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-header {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.dropdown-header strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.user-email {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+/* Role badge */
+.role-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.role-badge.role-admin {
+  background: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.role-badge.role-instructor {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.role-badge.role-user {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Dropdown items */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  font-size: 0.875rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+  color: #1e293b;
+  padding-left: 20px;
+}
+
+.dropdown-admin {
+  color: #8b5cf6;
+  font-weight: 600;
+}
+
+.dropdown-admin:hover {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 0;
+}
+
+.logout-item {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.logout-item:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  padding-left: 20px;
+}
+
+/* ================================================================
+   7. CART BUTTON
+================================================================ */
+.cart-btn {
+  position: relative;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  gap: 6px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.cart-btn-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.cart-btn-icon-only {
+  width: 38px;
+  min-width: 38px;
+  padding: 0;
+}
+
+.cart-btn-icon-only .cart-btn-label {
+  display: none;
+}
+
+.cart-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* ================================================================
+   8. HAMBURGER (MOBILE)
+================================================================ */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  background: none;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hamburger:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #94a3b8;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+/* ================================================================
+   9. BUTTONS - DÙNG CHUNG (btn, btn-primary, btn-outline)
+================================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  opacity: 0.95;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  background: white;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+.btn-lg {
+  padding: 13px 28px;
+  font-size: 1rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ================================================================
+   10. RESPONSIVE
+================================================================ */
+@media (max-width: 768px) {
+  .navbar-logo-image {
+    height: 34px;
+  }
+
+  .cart-btn {
+    width: 38px;
+    padding: 0;
+  }
+
+  .cart-btn-label {
+    display: none;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .navbar-container {
+    padding: 0 16px;
+  }
+
+  /* Mobile dropdown open */
+  .navbar-links.mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 16px;
+    gap: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    animation: mobileMenuIn 0.2s ease;
+  }
+
+  @keyframes mobileMenuIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .nav-link.active::after {
+    display: none;
+  }
+}
