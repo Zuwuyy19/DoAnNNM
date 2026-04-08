@@ -66,7 +66,7 @@ export default function AdminCourses() {
     try {
       // Gọi song song 2 API để tối ưu thời gian
       const [coursesRes, categoriesRes] = await Promise.all([
-        getAllCourses({ limit: 100, status: "" }),  // Lấy đủ để admin thấy tất cả
+        getAllCourses({ limit: 100, status: "all" }),  // Admin can see draft/published/archived
         getAllCategories(),
       ]);
       if (coursesRes.data.success) setCourses(coursesRes.data.data);
@@ -660,3 +660,4 @@ export default function AdminCourses() {
     </AdminLayout>
   );
 }
+

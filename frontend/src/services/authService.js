@@ -51,7 +51,8 @@ export const clearAuth = () => {
 // Body: { name, email, password }
 // ================================================
 export const register = async (data) => {
-  return await api.post("/auth/register", data);
+  const res = await api.post("/auth/register", data);
+  return res.data;
 };
 
 // ================================================

@@ -19,7 +19,12 @@ const {
 } = require("../controllers/course.controller");
 
 // Middleware xác thực
-const { verifyToken, requireAdmin, requireInstructor } = require("../middlewares/auth.middleware");
+const {
+  verifyToken,
+  requireAdmin,
+  requireInstructor,
+  optionalAuth,
+} = require("../middlewares/auth.middleware");
 
 // ================================================
 // PUBLIC ROUTES - Ai cũng xem được
@@ -27,7 +32,7 @@ const { verifyToken, requireAdmin, requireInstructor } = require("../middlewares
 
 // FEATURE 11: Lấy danh sách khóa học (tìm kiếm, lọc, phân trang)
 // GET /api/courses?category=xxx&level=Beginner&search=react&sort=-price&page=1&limit=12
-router.get("/", getAllCourses);
+router.get("/", optionalAuth, getAllCourses);
 
 // FEATURE 12: Lấy chi tiết 1 khóa học theo slug
 // GET /api/courses/:slug
@@ -79,3 +84,4 @@ router.delete("/:courseId", verifyToken, requireAdmin, deleteCourse);
 router.get("/admin/stats", verifyToken, requireAdmin, getDashboardStats);
 
 module.exports = router;
+

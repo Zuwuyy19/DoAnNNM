@@ -18,6 +18,7 @@ exports.getAllCourses = async (req, res) => {
       category,
       level,
       search,
+      status,
       sort = "-createdAt",
       minPrice,
       maxPrice,
@@ -26,8 +27,19 @@ exports.getAllCourses = async (req, res) => {
       limit = 12,
     } = req.query;
 
-    // Xây dựng query filter động
-    const filter = { status: "published" }; // Chỉ lấy khóa đã publish
+    // Public luon chi thay khoa da cong khai.
+    // Admin/instructor co the yeu cau xem tat ca hoac loc theo trang thai.
+    const canManageCourses =
+      req.user?.role === "admin" || req.user?.role === "instructor";
+    const filter = {};
+
+    if (canManageCourses && status) {
+      if (status !== "all") {
+        filter.status = status;
+      }
+    } else {
+      filter.status = "published";
+    }
 
     // Lọc theo danh mục
     if (category) filter.category = category;
@@ -638,3 +650,4 @@ async function updateCategoryCourseCount(categoryId) {
   });
   await Category.findByIdAndUpdate(categoryId, { courseCount: count });
 }
+
