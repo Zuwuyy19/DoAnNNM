@@ -18,7 +18,7 @@ export default function Checkout() {
   const [couponError, setCouponError] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMethod, setPaymentMethod] = useState("vnpay");
 
   // ================================================
   // Mount: lấy giỏ hàng từ localStorage
@@ -122,6 +122,12 @@ export default function Checkout() {
       const res = await createOrder(orderData);
 
       if (res.data.success) {
+        // Nếu có paymentUrl (VNPay/MoMo) -> Chuyển hướng
+        if (res.data.data.paymentUrl) {
+          window.location.href = res.data.data.paymentUrl;
+          return;
+        }
+
         localStorage.removeItem("cart");
         setCart([]);
         setMessage({ type: "success", text: "Đặt hàng thành công! Đang chuyển đến khóa học..." });
@@ -251,9 +257,7 @@ export default function Checkout() {
           <div className="payment-methods">
             <h4>Phương thức thanh toán</h4>
             {[
-              { value: "cod", label: "Thanh toán khi nhận (COD)" },
-              { value: "vnpay", label: "VNPay" },
-              { value: "momo", label: "MoMo" },
+              { value: "vnpay", label: "Ví điện tử VNPay (Thẻ ATM, QR Code, Thẻ quốc tế)" },
             ].map((opt) => (
               <label
                 key={opt.value}

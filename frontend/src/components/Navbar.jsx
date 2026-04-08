@@ -1,4 +1,4 @@
-// ================================================
+﻿// ================================================
 // COMPONENT: Navbar - Thanh điều hướng DÙNG CHUNG
 // Mô tả: Navbar thống nhất cho MỌI trang (kể cả Home)
 // Active underline animation + cart badge + user dropdown
@@ -38,7 +38,7 @@ const Navbar = () => {
     };
 
     updateNavbarData();
-    // Lắng nghe sự kiện thêm giỏ hàng (same-tab và cross-tab)
+    
     window.addEventListener("cartUpdated", updateNavbarData);
     window.addEventListener("storage", updateNavbarData);
 
@@ -57,9 +57,6 @@ const Navbar = () => {
     return false;
   };
 
-  // ================================================
-  // Xử lý đăng xuất
-  // ================================================
   const handleLogout = () => {
     logout();
     setUser(null);
@@ -75,7 +72,7 @@ const Navbar = () => {
           <img src="/logo-codenova.svg" alt="Courses" className="navbar-logo-image" />
         </Link>
 
-        {/* ===== MENU ĐIỀU HƯỚNG ===== */}
+        {/* ===== MENU ĐIỀU HƯỚNG===== */}
         <div className="navbar-links">
           <Link to="/" className={`nav-link ${isActive("/") ? "active" : ""}`}>
             Trang Chủ
@@ -85,12 +82,21 @@ const Navbar = () => {
           </Link>
           {user && (
             <>
-              <Link to="/dashboard" className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}>
-                Dashboard
-              </Link>
-              <Link to="/my-learning" className={`nav-link ${isActive("/my-learning") ? "active" : ""}`}>
-                Học Tập
-              </Link>
+              {/* Menu cho học viên */}
+              {user.role === "student" && (
+                <Link to="/my-learning" className={`nav-link ${isActive("/my-learning") ? "active" : ""}`}>
+                  Học Viên
+                </Link>
+              )}
+
+              {/* Menu cho Giảng viên */}
+              {user.role === "instructor" && (
+                <Link to="/teacher" className={`nav-link ${isActive("/teacher") ? "active" : ""}`}>
+                  Giảng Viên
+                </Link>
+              )}
+
+              {/* Menu cho Admin */}
               <Link to="/my-orders" className={`nav-link ${isActive("/my-orders") ? "active" : ""}`}>
                 Đơn Hàng
               </Link>
@@ -103,7 +109,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* ===== ACTIONS BÊN PHẢI ===== */}
+        {/* ===== ACTIONS  ===== */}
         <div className="navbar-actions">
           {!user ? (
             <>
@@ -187,6 +193,13 @@ const Navbar = () => {
                       Đơn hàng
                     </Link>
 
+                    {user.role === "instructor" && (
+                      <Link to="/teacher" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                        <span style={{ display: "inline-flex", alignItems: "center" }}><Icon name="bookOpen" size={16} /></span>
+                        Trang giảng viên
+                      </Link>
+                    )}
+
                     {user.role === "admin" && (
                       <Link to="/admin" className="dropdown-item dropdown-admin" onClick={() => setDropdownOpen(false)}>
                         <span style={{ display: "inline-flex", alignItems: "center" }}><Icon name="settings" size={16} /></span>
@@ -219,3 +232,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

@@ -36,8 +36,10 @@ export default function Login() {
       if (data.success) {
         if (data.user.role === "admin") {
           navigate("/admin");
+        } else if (data.user.role === "instructor") {
+          navigate("/my-teaching");
         } else {
-          navigate("/dashboard");
+          navigate("/");
         }
       } else {
         setError(data.message || "Đăng nhập thất bại");

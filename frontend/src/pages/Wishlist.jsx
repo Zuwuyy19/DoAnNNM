@@ -23,6 +23,8 @@ export default function Wishlist() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") return;
+
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
     if (cart.some((item) => (item._id || item.courseId) === course._id)) {
@@ -51,6 +53,11 @@ export default function Wishlist() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") {
+      navigate(`/learning/${course.slug}`);
+      return;
+    }
+
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
     if (!cart.some((item) => (item._id || item.courseId) === course._id)) {
@@ -206,20 +213,36 @@ export default function Wishlist() {
                   </div>
                   {/* Hành động: Mua & Thêm giỏ hàng */}
                   <div className="course-card-actions" style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-                    <button 
-                      className="btn btn-primary" 
-                      style={{ flex: 1, padding: "8px 0", fontSize: "0.85rem", borderRadius: "6px" }}
-                      onClick={(e) => handleBuyNow(e, course)}
-                    >
-                       Mua ngay
-                    </button>
-                    <button 
-                      className="btn btn-outline" 
-                      style={{ flex: 1, padding: "8px 0", fontSize: "0.85rem", borderRadius: "6px" }}
-                      onClick={(e) => handleAddToCart(e, course)}
-                    >
-                       Thêm giỏ hàng
-                    </button>
+                    {user?.role === "admin" ? (
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ flex: 1, padding: "8px 0", fontSize: "0.85rem", borderRadius: "6px", background: "#10b981", borderColor: "#10b981" }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigate(`/learning/${course.slug}`);
+                        }}
+                      >
+                         Vào học ngay
+                      </button>
+                    ) : (
+                      <>
+                        <button 
+                          className="btn btn-primary" 
+                          style={{ flex: 1, padding: "8px 0", fontSize: "0.85rem", borderRadius: "6px" }}
+                          onClick={(e) => handleBuyNow(e, course)}
+                        >
+                           Mua ngay
+                        </button>
+                        <button 
+                          className="btn btn-outline" 
+                          style={{ flex: 1, padding: "8px 0", fontSize: "0.85rem", borderRadius: "6px" }}
+                          onClick={(e) => handleAddToCart(e, course)}
+                        >
+                           Thêm giỏ hàng
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

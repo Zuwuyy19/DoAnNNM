@@ -8,6 +8,7 @@ import {
   getAllUsers,
   updateUserRole,
   toggleUserStatus,
+  deleteUser,
 } from "../../services/authService";
 import AdminLayout from "../../components/AdminLayout";
 import Icon from "../../components/Icon";
@@ -125,6 +126,31 @@ export default function AdminUsers() {
       }
     } catch (err) {
       showMessage("error", err.response?.data?.message || "Lỗi thao tác");
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  // ================================================
+  // HÀM: Xóa vĩnh viễn người dùng
+  // FEATURE 11: Xóa tài khoản
+  // ================================================
+  const handleDeleteUser = async (userId, userName) => {
+    // Xác nhận trước khi xóa
+    if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn tài khoản "${userName}"?\n\nHành động này không thể hoàn tác!`)) {
+      return;
+    }
+
+    setProcessing(userId);
+    try {
+      const res = await deleteUser(userId);
+      if (res.data.success) {
+        showMessage("success", "Đã xóa người dùng thành công!");
+        // Cập nhật lại danh sách (xóa khỏi state)
+        setUsers((prev) => prev.filter((u) => u._id !== userId));
+      }
+    } catch (err) {
+      showMessage("error", err.response?.data?.message || "Lỗi khi xóa người dùng");
     } finally {
       setProcessing(null);
     }
@@ -309,21 +335,37 @@ export default function AdminUsers() {
 
                   {/* Hành động: Khóa / Mở khóa */}
                   <td>
-                    <button
-                      className={`btn-action ${user.isActive !== false ? "btn-delete" : "btn-primary"}`}
-                      onClick={() => handleToggleStatus(user._id)}
-                      disabled={processing === user._id}
-                      title={
-                        user.isActive !== false
-                          ? "Khóa tài khoản này"
-                          : "Mở khóa tài khoản này"
-                      }
-                    >
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                        {user.isActive !== false ? <Icon name="lock" size={14} /> : <Icon name="checkCircle" size={14} />}
-                        {user.isActive !== false ? "Khóa" : "Mở khóa"}
-                      </span>
-                    </button>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      {/* Nút Khóa / Mở khóa */}
+                      <button
+                        className={`btn-action ${user.isActive !== false ? "btn-delete" : "btn-primary"}`}
+                        onClick={() => handleToggleStatus(user._id)}
+                        disabled={processing === user._id}
+                        title={
+                          user.isActive !== false
+                            ? "Khóa tài khoản này"
+                            : "Mở khóa tài khoản này"
+                        }
+                      >
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                          {user.isActive !== false ? <Icon name="lock" size={14} /> : <Icon name="checkCircle" size={14} />}
+                          {user.isActive !== false ? "Khóa" : "Mở khóa"}
+                        </span>
+                      </button>
+
+                      {/* Nút Xóa vĩnh viễn */}
+                      <button
+                        className="btn-action btn-delete"
+                        onClick={() => handleDeleteUser(user._id, user.name)}
+                        disabled={processing === user._id || user.role === "admin"}
+                        title="Xóa vĩnh viễn người dùng này"
+                      >
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                          <Icon name="logout" size={14} />
+                          Xóa
+                        </span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

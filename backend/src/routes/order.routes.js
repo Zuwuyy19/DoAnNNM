@@ -12,6 +12,8 @@ const {
   getAllOrders,
   updateOrderStatus,
   applyCoupon,
+  vnpayReturn,
+  vnpayIPN,
 } = require("../controllers/order.controller");
 
 const { verifyToken, requireAdmin } = require("../middlewares/auth.middleware");
@@ -32,7 +34,10 @@ router.post("/apply-coupon", verifyToken, applyCoupon);
 // GET /api/orders/my
 router.get("/my", verifyToken, getMyOrders);
 
-// Lấy chi tiết đơn hàng theo ID
+// VNPay Callback & IPN
+router.get("/vnpay-return", vnpayReturn);
+router.get("/vnpay-ipn", vnpayIPN);
+
 // GET /api/orders/:orderId
 router.get("/:orderId", verifyToken, getOrderById);
 

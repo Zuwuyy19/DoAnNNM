@@ -37,37 +37,60 @@ export default function CourseDetail() {
   // EFFECT: Lấy thông tin khóa học + user khi mount
   // ================================================
   useEffect(() => {
-    fetchCourse();
     const currentUser = getUser();
     setUser(currentUser);
-    if (currentUser) {
-      checkEnrollment();
-    }
+    fetchCourse(currentUser);
   }, [slug]);
 
-  const checkEnrollment = async () => {
+  const checkEnrollment = async (currentUser, loadedCourse) => {
+    if (!currentUser || !loadedCourse) {
+      setIsEnrolled(false);
+      return;
+    }
+
     try {
+      const isAdmin = currentUser.role === "admin";
+      const instructorId = loadedCourse.instructor?._id || loadedCourse.instructor;
+      const isInstructorOwner =
+        currentUser.role === "instructor" && instructorId === currentUser.id;
+
+      if (isAdmin || isInstructorOwner) {
+        setIsEnrolled(true);
+        return;
+      }
+
       const res = await getMyEnrolledCourses();
       if (res.data?.success && res.data.data) {
-        setIsEnrolled(res.data.data.some((c) => c.slug === slug));
+        const enrolled = res.data.data.some((c) => c.slug === slug);
+        setIsEnrolled(enrolled);
+      } else {
+        setIsEnrolled(false);
       }
     } catch (err) {
       console.log("Check enrollment error:", err);
+      setIsEnrolled(false);
     }
   };
 
   // ================================================
   // FEATURE 12: Lấy chi tiết khóa học theo slug
   // ================================================
-  const fetchCourse = async () => {
+  const fetchCourse = async (currentUser) => {
     setLoading(true);
     try {
       const res = await getCourseBySlug(slug);
       if (res.data.success) {
-        setCourse(res.data.data);
+        const loadedCourse = res.data.data;
+        setCourse(loadedCourse);
+        await checkEnrollment(currentUser, loadedCourse);
+      } else {
+        setCourse(null);
+        setIsEnrolled(false);
       }
     } catch (error) {
       console.error("Lỗi lấy chi tiết khóa học:", error);
+      setCourse(null);
+      setIsEnrolled(false);
     } finally {
       setLoading(false);
     }
@@ -81,6 +104,8 @@ export default function CourseDetail() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") return;
+
 
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
@@ -114,6 +139,11 @@ export default function CourseDetail() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") {
+      navigate(`/learning/${course.slug}`);
+      return;
+    }
+
 
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
@@ -176,7 +206,7 @@ export default function CourseDetail() {
         setMessage({ type: "success", text: "Đánh giá thành công!" });
         setShowReviewForm(false);
         setReviewComment("");
-        fetchCourse();
+        fetchCourse(user);
       }
     } catch (err) {
       setMessage({
@@ -273,7 +303,7 @@ export default function CourseDetail() {
           <div className={`message-box ${message.type}`}>{message.text}</div>
         )}
 
-        {/* ===== HERO ẢNH BÌA ===== */}
+        {/* ===== HERO ảnh bìa===== */}
         <div className="detail-hero">
           <img
             src={course.image}
@@ -429,39 +459,76 @@ export default function CourseDetail() {
               {/* SECTION 3: RESOURCES */}
               <div id="resources" className="tab-pane" style={{ marginBottom: '40px' }}>
                 <div className="detail-section-title">Tài liệu đính kèm</div>
-                  {!isEnrolled ? (
+                  {!isEnrolled && user?.role !== 'admin' ? (
                     <div className="locked-resources glass-panel" style={{ textAlign:'center', padding:'40px 20px' }}>
                       <div style={{ fontSize:'1.6rem', marginBottom:'12px', fontWeight: 800, color: 'var(--text-primary)' }}>
                         Nội dung bị khóa
                       </div>
                       <h3 style={{ marginBottom:'8px' }}>Tài liệu bị khóa</h3>
-                      <p style={{ color:'var(--text-muted)' }}>Vui lòng mua khóa học để truy cập source code, PDF slide bài giảng và các tài liệu độc quyền khác.</p>
+                      <p style={{ color:'var(--text-muted)' }}>Vui lòng mua khóa học để truy cập source code, PDF slide bài giảng và các tài liệu được quyền khác.</p>
                       <button className="btn btn-primary" style={{ marginTop:'16px' }} onClick={handleBuyNow}>
                         Mua khóa học ngay
                       </button>
                     </div>
                   ) : (
                     <div className="unlocked-resources">
-                      <div className="resource-item">
-                        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
-                          <Icon name="search" size={20} />
-                        </span>
-                        <div style={{flex:1}}>
-                          <div style={{fontWeight:'600'}}>Slide bài giảng toàn khóa (PDF)</div>
-                          <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>15.2 MB</div>
-                        </div>
-                        <button className="btn btn-outline btn-sm">Tải xuống</button>
-                      </div>
-                      <div className="resource-item">
-                        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
-                          <Icon name="settings" size={20} />
-                        </span>
-                        <div style={{flex:1}}>
-                          <div style={{fontWeight:'600'}}>Source code thực hành (ZIP)</div>
-                          <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>45.8 MB</div>
-                        </div>
-                        <button className="btn btn-outline btn-sm">Tải xuống</button>
-                      </div>
+                      {course.attachments && course.attachments.length > 0 ? (
+                        course.attachments.map((file, idx) => (
+                          <div key={idx} className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                              <Icon name="bookOpen" size={20} />
+                            </span>
+                            <div style={{flex:1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
+                              <div style={{fontWeight:'600'}}>{file.title || "Tài liệu đính kèm"}</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>{file.fileUrl}</div>
+                            </div>
+                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm">Mở link</a>
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                              <Icon name="search" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Slide bài giảng toàn khóa (PDF)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>15.2 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--primary)" }}>
+                              <Icon name="settings" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Source code thực hành (ZIP)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>45.8 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#3b82f6" }}>
+                              <Icon name="bookOpen" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Tài liệu tham khảo chi tiết (Word .docx)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>2.4 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                          <div className="resource-item">
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#f59e0b" }}>
+                              <Icon name="bookOpen" size={20} />
+                            </span>
+                            <div style={{flex:1}}>
+                              <div style={{fontWeight:'600'}}>Bài tập thực hành buổi 1-5 (PPTX)</div>
+                              <div style={{fontSize:'0.8rem', color:'var(--text-muted)'}}>12.1 MB</div>
+                            </div>
+                            <button className="btn btn-outline btn-sm">Tải xuống</button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
               </div>
@@ -569,7 +636,7 @@ export default function CourseDetail() {
               }}
             />
             <div className="detail-sidebar-body">
-              {/* Giá */}
+              {/* GiÃ¡ */}
               <div>
                 {isEnrolled ? (
                   <span className="price-free" style={{ fontSize: "1.35rem", fontWeight: "900", color: "var(--success)" }}>
@@ -582,10 +649,10 @@ export default function CourseDetail() {
                 ) : hasDiscount ? (
                   <>
                     <span className="sidebar-price">
-                      {displayPrice.toLocaleString("vi-VN")}đ
+                      {displayPrice.toLocaleString("vi-VN")}Ä‘
                     </span>
                     <span className="sidebar-price-old">
-                      {course.price.toLocaleString("vi-VN")}đ
+                      {course.price.toLocaleString("vi-VN")}Ä‘
                     </span>
                     <span
                       style={{
@@ -604,7 +671,7 @@ export default function CourseDetail() {
                   </>
                 ) : (
                   <span className="sidebar-price">
-                    {displayPrice.toLocaleString("vi-VN")}đ
+                    {displayPrice.toLocaleString("vi-VN")}Ä‘
                   </span>
                 )}
               </div>
@@ -634,7 +701,7 @@ export default function CourseDetail() {
                       style={{ flex: 1, padding: "12px 0", fontSize: "1rem", borderRadius: "8px" }}
                       onClick={handleAddToCart}
                     >
-                      Thêm giỏ hàng
+                      Thêm vào giỏ hàng
                     </button>
                   </>
                 )}

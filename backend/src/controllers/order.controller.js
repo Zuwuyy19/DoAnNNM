@@ -7,6 +7,82 @@ const Course = require("../models/Course");
 const User = require("../models/User");
 const Coupon = require("../models/Coupon");
 
+const getPaidCouponUsageByUser = async (userId, couponCode) => {
+  if (!couponCode) return 0;
+
+  return Order.countDocuments({
+    user: userId,
+    couponCode,
+    paymentStatus: "paid",
+  });
+};
+
+const validateCouponForCheckout = async ({ coupon, userId }) => {
+  if (!coupon) {
+    return {
+      valid: false,
+      message: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+    };
+  }
+
+  const now = new Date();
+
+  if (coupon.startDate && now < new Date(coupon.startDate)) {
+    return {
+      valid: false,
+      message: "Mã giảm giá chưa đến thời gian sử dụng",
+    };
+  }
+
+  if (coupon.endDate && now > new Date(coupon.endDate)) {
+    return {
+      valid: false,
+      message: "Mã giảm giá đã hết hạn",
+    };
+  }
+
+  if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+    return {
+      valid: false,
+      message: "Mã giảm giá đã hết lượt sử dụng",
+    };
+  }
+
+  if (coupon.maxUsagePerUser) {
+    const userUsageCount = await getPaidCouponUsageByUser(userId, coupon.code);
+    if (userUsageCount >= coupon.maxUsagePerUser) {
+      return {
+        valid: false,
+        message: "Bạn đã dùng hết số lần sử dụng mã giảm giá này",
+      };
+    }
+  }
+
+  return { valid: true };
+};
+
+const incrementCouponUsage = async (couponCode) => {
+  if (!couponCode) return;
+
+  const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+  if (!coupon) return;
+
+  const filter = { _id: coupon._id };
+  if (coupon.usageLimit) {
+    filter.usedCount = { $lt: coupon.usageLimit };
+  }
+
+  const updatedCoupon = await Coupon.findOneAndUpdate(
+    filter,
+    { $inc: { usedCount: 1 } },
+    { new: true }
+  );
+
+  if (!updatedCoupon) {
+    throw new Error("Mã giảm giá đã hết lượt sử dụng");
+  }
+};
+
 // ================================================
 // FEATURE 25: Tạo đơn hàng mới (User)
 // Input: items (mảng {courseId, price}), couponCode, paymentMethod
@@ -74,26 +150,15 @@ exports.createOrder = async (req, res) => {
         isActive: true,
       });
 
-      if (!coupon) {
-        return res.status(400).json({
-          success: false,
-          message: "Mã giảm giá không hợp lệ hoặc đã hết hạn",
-        });
-      }
+      const couponValidation = await validateCouponForCheckout({
+        coupon,
+        userId: req.user.id,
+      });
 
-      // Kiểm tra thời hạn
-      if (new Date() > new Date(coupon.endDate)) {
+      if (!couponValidation.valid) {
         return res.status(400).json({
           success: false,
-          message: "Mã giảm giá đã hết hạn",
-        });
-      }
-
-      // Kiểm tra số lượng sử dụng
-      if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-        return res.status(400).json({
-          success: false,
-          message: "Mã giảm giá đã hết lượt sử dụng",
+          message: couponValidation.message,
         });
       }
 
@@ -143,7 +208,7 @@ exports.createOrder = async (req, res) => {
       totalAmount: finalAmount,
       couponCode: appliedCoupon ? appliedCoupon.code : null,
       discountAmount,
-      paymentMethod: paymentMethod || "cod",
+      paymentMethod: paymentMethod || "vnpay",
       buyerEmail: user.email,
     });
 
@@ -162,37 +227,14 @@ exports.createOrder = async (req, res) => {
           orderNumber: order.orderNumber,
           totalAmount: finalAmount,
           paymentMethod,
-          // DEV: paymentUrl sẽ được tạo từ cổng thanh toán thực
-          paymentUrl: `https://sandbox.vnpay.vn/payment?order=${order.orderNumber}`,
+          // Sử dụng hàm tiện ích để tạo URL thanh toán thật
+          paymentUrl: require("../utils/vnpay").createPaymentUrl(order, req.ip || req.connection.remoteAddress),
         },
       });
     }
 
-    // Nếu là COD: xử lý đăng ký khóa học ngay
-    if (paymentMethod === "cod") {
-      // Cập nhật paymentStatus = paid và orderStatus = completed
-      order.paymentStatus = "paid";
-      order.orderStatus = "completed";
-      await order.save();
-
-      // Thêm khóa học vào danh sách enrolledCourses của user
-      for (const item of orderItems) {
-        user.enrolledCourses.push(item.course);
-
-        // Tăng số lượng học viên trong khóa học
-        await Course.findByIdAndUpdate(item.course, {
-          $inc: { enrolledCount: 1 },
-        });
-      }
-
-      // Tăng số lần sử dụng coupon
-      if (appliedCoupon) {
-        appliedCoupon.usedCount += 1;
-        await appliedCoupon.save();
-      }
-
-      await user.save();
-    }
+    // Lưu ý: Đã loại bỏ phương thức COD cho sản phẩm số (Online Courses)
+    // Toàn bộ quy trình thanh toán sẽ được xử lý qua vnpayReturn/vnpayIPN
 
     res.status(201).json({
       success: true,
@@ -325,12 +367,16 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
+    const previousPaymentStatus = order.paymentStatus;
+
     // Cập nhật trạng thái
     if (orderStatus) order.orderStatus = orderStatus;
     if (paymentStatus) order.paymentStatus = paymentStatus;
 
     // Nếu thanh toán thành công -> cấp quyền học
-    if (paymentStatus === "paid" && order.paymentStatus !== "paid") {
+    if (paymentStatus === "paid" && previousPaymentStatus !== "paid") {
+      await incrementCouponUsage(order.couponCode);
+
       const user = await User.findById(order.user);
       for (const item of order.items) {
         if (!user.enrolledCourses.includes(item.course)) {
@@ -371,24 +417,15 @@ exports.applyCoupon = async (req, res) => {
       isActive: true,
     });
 
-    if (!coupon) {
-      return res.status(400).json({
-        success: false,
-        message: "Mã giảm giá không tồn tại",
-      });
-    }
+    const couponValidation = await validateCouponForCheckout({
+      coupon,
+      userId: req.user.id,
+    });
 
-    if (new Date() > new Date(coupon.endDate)) {
+    if (!couponValidation.valid) {
       return res.status(400).json({
         success: false,
-        message: "Mã giảm giá đã hết hạn",
-      });
-    }
-
-    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
-      return res.status(400).json({
-        success: false,
-        message: "Mã giảm giá đã hết lượt sử dụng",
+        message: couponValidation.message,
       });
     }
 
@@ -408,5 +445,142 @@ exports.applyCoupon = async (req, res) => {
       success: false,
       message: "Lỗi server",
     });
+  }
+};
+
+// ================================================
+// FEATURE: Xử lý kết quả trả về từ VNPay (Return URL)
+// ================================================
+exports.vnpayReturn = async (req, res) => {
+  try {
+    const vnp_Params = { ...req.query };
+    const { verifyReturnUrl } = require("../utils/vnpay");
+
+    console.log("--- VNPAY RETURN START ---");
+    console.log("Params received:", vnp_Params);
+
+    const isValid = verifyReturnUrl(vnp_Params);
+    console.log("Is signature valid?:", isValid);
+
+    // Lưu ý: vnp_Params đã bị xóa secureHash trong verifyReturnUrl
+    const orderNumber = req.query["vnp_TxnRef"];
+    const responseCode = req.query["vnp_ResponseCode"];
+
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Chữ ký không hợp lệ" });
+    }
+
+    const order = await Order.findOne({ orderNumber });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy đơn hàng" });
+    }
+
+    if (responseCode === "00") {
+      // THANH TOÁN THÀNH CÔNG -> CẤP QUYỀN TRUY CẬP NGAY
+      if (order.paymentStatus !== "paid") {
+        await incrementCouponUsage(order.couponCode);
+
+        order.paymentStatus = "paid";
+        order.orderStatus = "completed"; // Chuyển từ processing -> completed ngay
+        order.transactionId = vnp_Params["vnp_TransactionNo"];
+        await order.save();
+
+        // Thêm khóa học vào enrolledCourses của user
+        const user = await User.findById(order.user);
+        for (const item of order.items) {
+          if (!user.enrolledCourses.includes(item.course)) {
+            user.enrolledCourses.push(item.course);
+            // Tăng số lượng học viên
+            await Course.findByIdAndUpdate(item.course, { $inc: { enrolledCount: 1 } });
+          }
+        }
+        await user.save();
+      }
+
+      return res.json({
+        success: true,
+        message: "Thanh toán thành công",
+        data: { orderId: order._id, orderNumber }
+      });
+    } else {
+      // THANH TOÁN THẤT BẠI HOẶC BỊ HỦY
+      order.paymentStatus = "failed";
+      order.orderStatus = "failed";
+      await order.save();
+
+      return res.json({
+        success: false,
+        message: "Thanh toán bị hủy hoặc có lỗi xảy ra",
+        code: responseCode
+      });
+    }
+  } catch (error) {
+    console.error("CRITICAL: Lỗi vnpayReturn:", error);
+    res.status(500).json({ success: false, message: "Lỗi server: " + error.message });
+  }
+};
+
+// ================================================
+// FEATURE: Cập nhật trạng thái đơn qua IPN (Server-to-Server)
+// ================================================
+exports.vnpayIPN = async (req, res) => {
+  try {
+    const vnp_Params = req.query;
+    const { verifyReturnUrl } = require("../utils/vnpay");
+
+    const isValid = verifyReturnUrl({ ...vnp_Params });
+    if (!isValid) {
+      return res.status(200).json({ RspCode: "97", Message: "Invalid checksum" });
+    }
+
+    const orderNumber = vnp_Params["vnp_TxnRef"];
+    const responseCode = vnp_Params["vnp_ResponseCode"];
+    const vnp_Amount = vnp_Params["vnp_Amount"];
+
+    const order = await Order.findOne({ orderNumber });
+    if (!order) {
+      return res.status(200).json({ RspCode: "01", Message: "Order not found" });
+    }
+
+    // Kiểm tra số tiền (VNPay x100)
+    if (Math.round(order.totalAmount * 100) !== Number(vnp_Amount)) {
+      return res.status(200).json({ RspCode: "04", Message: "Amount invalid" });
+    }
+
+    // Kiểm tra trạng thái đơn hàng (chỉ xử lý nếu chưa thanh toán)
+    if (order.paymentStatus !== "pending") {
+      return res.status(200).json({ RspCode: "02", Message: "Order already confirmed" });
+    }
+
+    if (responseCode === "00") {
+      // THANH TOÁN THÀNH CÔNG
+      await incrementCouponUsage(order.couponCode);
+
+      order.paymentStatus = "paid";
+      order.orderStatus = "completed";
+      order.transactionId = vnp_Params["vnp_TransactionNo"];
+      await order.save();
+
+      // Cấp quyền học cho user
+      const user = await User.findById(order.user);
+      for (const item of order.items) {
+        if (!user.enrolledCourses.includes(item.course)) {
+          user.enrolledCourses.push(item.course);
+          await Course.findByIdAndUpdate(item.course, { $inc: { enrolledCount: 1 } });
+        }
+      }
+      await user.save();
+
+      return res.status(200).json({ RspCode: "00", Message: "Success" });
+    } else {
+      // THANH TOÁN THẤT BẠI
+      order.paymentStatus = "failed";
+      order.orderStatus = "failed";
+      await order.save();
+      return res.status(200).json({ RspCode: "00", Message: "Success (Payment Failed)" });
+    }
+  } catch (error) {
+    console.error("Lỗi vnpayIPN:", error);
+    res.status(500).json({ RspCode: "99", Message: "Unknown error" });
   }
 };

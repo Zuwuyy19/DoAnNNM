@@ -72,7 +72,7 @@ export default function AdminDashboard() {
         <div className="admin-stat-card">
           <div className="admin-stat-icon warning"><Icon name="clock" size={18} /></div>
           <div className="admin-stat-info">
-            <h3>{(stats?.totalRevenue || 0).toLocaleString("vi-VN")}đ</h3>
+            <h3 className="admin-stat-money">{(stats?.totalRevenue || 0).toLocaleString("vi-VN")}đ</h3>
             <p>Tổng doanh thu</p>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
         <div className="admin-stat-card">
           <div className="admin-stat-icon green"><Icon name="clock" size={18} /></div>
           <div className="admin-stat-info">
-            <h3>{(stats?.monthlyRevenue || 0).toLocaleString("vi-VN")}đ</h3>
+            <h3 className="admin-stat-money">{(stats?.monthlyRevenue || 0).toLocaleString("vi-VN")}đ</h3>
             <p>Doanh thu tháng này</p>
           </div>
         </div>

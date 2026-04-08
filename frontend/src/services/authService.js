@@ -144,6 +144,14 @@ export const toggleUserStatus = async (userId) => {
 };
 
 // ================================================
+// FEATURE 11: Xóa người dùng (Admin)
+// DELETE /api/auth/users/:userId
+// ================================================
+export const deleteUser = async (userId) => {
+  return await api.delete(`/auth/users/${userId}`);
+};
+
+// ================================================
 // Đăng xuất: Xóa token và chuyển về login
 // ================================================
 export const logout = () => {

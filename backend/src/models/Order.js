@@ -66,7 +66,7 @@ const OrderSchema = new mongoose.Schema(
     // Trạng thái đơn hàng: 'processing' | 'completed' | 'cancelled'
     orderStatus: {
       type: String,
-      enum: ["processing", "completed", "cancelled"],
+      enum: ["processing", "completed", "cancelled", "failed"],
       default: "processing",
     },
     // Mã đơn hàng tự tăng

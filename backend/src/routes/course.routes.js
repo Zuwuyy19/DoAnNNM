@@ -36,7 +36,7 @@ router.get("/", optionalAuth, getAllCourses);
 
 // FEATURE 12: Lấy chi tiết 1 khóa học theo slug
 // GET /api/courses/:slug
-router.get("/:slug", getCourseBySlug);
+router.get("/:slug", optionalAuth, getCourseBySlug);
 
 // FEATURE 17: Thêm/Xóa khóa học vào Wishlist
 // POST /api/courses/:courseId/wishlist?action=add

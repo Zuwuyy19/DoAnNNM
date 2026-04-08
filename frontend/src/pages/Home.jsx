@@ -25,6 +25,8 @@ export default function Home() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") return;
+
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
     if (cart.some((item) => (item._id || item.courseId) === course._id)) {
@@ -53,6 +55,11 @@ export default function Home() {
       navigate("/login");
       return;
     }
+    if (user.role === "admin") {
+      navigate(`/learning/${course.slug}`);
+      return;
+    }
+
     let cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!Array.isArray(cart)) cart = [];
     if (!cart.some((item) => (item._id || item.courseId) === course._id)) {
@@ -276,7 +283,7 @@ export default function Home() {
                   return aOwned ? -1 : 1; // owned lên đầu
                 })
                 .map((course) => {
-                const isOwned = ownedCourseIds.has(course._id);
+                const isOwned = ownedCourseIds.has(course._id) || user?.role === "admin";
                 return (
                 <div
                   key={course._id}
