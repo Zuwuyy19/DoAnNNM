@@ -172,7 +172,7 @@ const Navbar = () => {
                       <strong>{user.name}</strong>
                       <span className="user-email">{user.email}</span>
                       <span className={`role-badge role-${user.role}`}>
-                        {user.role === "admin" ? "Quan tri vien" : user.role === "instructor" ? "Giang vien" : "Hoc vien"}
+                        {user.role === "admin" ? "Quản trị viên" : user.role === "instructor" ? "Giảng viên" : "Học viên"}
                       </span>
                     </div>
 

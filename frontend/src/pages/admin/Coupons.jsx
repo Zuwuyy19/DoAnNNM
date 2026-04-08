@@ -1,4 +1,4 @@
-// ================================================
+﻿// ================================================
 // PAGE: AdminCoupons - Quản lý mã giảm giá (Admin)
 // Mô tả: CRUD mã giảm giá, phần trăm hoặc số tiền cố định
 // ================================================
@@ -28,7 +28,7 @@ const getCouponStatus = (coupon) => {
   // Đã hết hạn
   if (end && now > end) return { label: "Hết hạn", cls: "badge-archived", icon: "clock" };
   // Hết số lượng
-  if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
+  if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
     return { label: "Hết mã", cls: "badge-archived", icon: "lock" };
   }
   // Hoạt động
@@ -56,7 +56,7 @@ export default function AdminCoupons() {
     minOrderAmount: 0,  // Đơn hàng tối thiểu (VNĐ)
     maxDiscountAmount: "", // Giảm tối đa (chỉ khi giảm %)
     usageLimit: "",     // Số lượng mã (null = unlimited)
-    usageCount: 0,      // Số lần đã sử dụng
+    usedCount: 0,      // Số lần đã sử dụng
     startDate: "",     // Ngày bắt đầu
     endDate: "",       // Ngày kết thúc
     isActive: true,     // Bật / Tắt
@@ -96,7 +96,7 @@ export default function AdminCoupons() {
   };
 
   // ================================================
-  // HÀM: Hiện thông báo (tự động ẩn sau 4s)
+  // HÀM: Hiển thị thông báo (tự động ẩn sau 4s)
   // ================================================
   const showMessage = (type, text) => {
     setMessage({ type, text });
@@ -116,7 +116,7 @@ export default function AdminCoupons() {
       minOrderAmount: 0,
       maxDiscountAmount: "",
       usageLimit: "",
-      usageCount: 0,
+      usedCount: 0,
       startDate: "",
       endDate: "",
       isActive: true,
@@ -138,7 +138,7 @@ export default function AdminCoupons() {
       minOrderAmount: coupon.minOrderAmount || 0,
       maxDiscountAmount: coupon.maxDiscountAmount || "",
       usageLimit: coupon.usageLimit || "",
-      usageCount: coupon.usageCount || 0,
+      usedCount: coupon.usedCount || 0,
       startDate: coupon.startDate ? coupon.startDate.split("T")[0] : "",
       endDate: coupon.endDate ? coupon.endDate.split("T")[0] : "",
       isActive: coupon.isActive !== false,
@@ -284,7 +284,7 @@ export default function AdminCoupons() {
               {/* Input: Giá trị giảm */}
               <div className="admin-form-group">
                 <label>
-                  Giá trị giảm {formData.discountType === "percent" ? "(%)" : "(VNĐ)"} <span className="required">*</span>
+                  Giá trị giảm {formData.discountType === "percent" ? "(%)" : "(VNĐ )"} <span className="required">*</span>
                 </label>
                 <input
                   type="number"
@@ -453,7 +453,7 @@ export default function AdminCoupons() {
                           <span style={{ fontWeight: "700", color: "#ef4444" }}>
                             {coupon.discountType === "percent"
                               ? `-${coupon.discountValue}%`
-                              : `-${coupon.discountValue?.toLocaleString("vi-VN")}đ`}
+                              : `-${coupon.discountValue?.toLocaleString("vi-VN")}Ä‘`}
                           </span>
                           {coupon.discountType === "percent" && coupon.maxDiscountAmount && (
                             <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>
@@ -465,14 +465,14 @@ export default function AdminCoupons() {
                         {/* Đơn hàng tối thiểu */}
                         <td style={{ color: "#64748b", fontSize: "0.83rem" }}>
                           {coupon.minOrderAmount > 0
-                            ? `${coupon.minOrderAmount?.toLocaleString("vi-VN")}đ`
+                            ? `${coupon.minOrderAmount?.toLocaleString("vi-VN")}Ä‘`
                             : "—"}
                         </td>
 
                         {/* Đã sử dụng / Giới hạn */}
                         <td style={{ textAlign: "center" }}>
                           <span className="badge badge-level">
-                            {coupon.usageCount || 0}
+                            {coupon.usedCount || 0}
                             {coupon.usageLimit ? ` / ${coupon.usageLimit}` : " / ∞"}
                           </span>
                         </td>
@@ -509,7 +509,7 @@ export default function AdminCoupons() {
                   {coupons.length === 0 && (
                     <tr>
                       <td colSpan="8" className="admin-empty-cell">
-                        Chưa có mã giảm giá nào. Bấm "Tạo mã giảm giá mới"!
+                        Chưa có mã giảm giá nào. Ấn "Tạo mã giảm giá mới"!
                       </td>
                     </tr>
                   )}
@@ -522,3 +522,4 @@ export default function AdminCoupons() {
     </AdminLayout>
   );
 }
+
