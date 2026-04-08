@@ -49,7 +49,15 @@ export default function CourseDetail() {
     try {
       const res = await getMyEnrolledCourses();
       if (res.data?.success && res.data.data) {
-        setIsEnrolled(res.data.data.some((c) => c.slug === slug));
+        // Có 3 trường hợp được coi là "đã sở hữu":
+        // 1. User đã mua (có trong enrolledCourses)
+        // 2. User là ADMIN (có quyền xem mọi thứ)
+        // 3. User là GIẢNG VIÊN của chính khóa học này
+        const enrolled = res.data.data.some((c) => c.slug === slug);
+        const isAdmin = user?.role === "admin";
+        const isInstructorOwner = user?.role === "instructor" && course?.instructor?._id === user?.id;
+
+        setIsEnrolled(enrolled || isAdmin || isInstructorOwner);
       }
     } catch (err) {
       console.log("Check enrollment error:", err);

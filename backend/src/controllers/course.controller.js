@@ -37,6 +37,10 @@ exports.getAllCourses = async (req, res) => {
       if (status !== "all") {
         filter.status = status;
       }
+      // Nếu là giảng viên, chỉ lấy khóa học do chính họ tạo
+      if (req.user.role === "instructor") {
+        filter.instructor = req.user.id;
+      }
     } else {
       filter.status = "published";
     }

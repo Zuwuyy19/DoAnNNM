@@ -10,13 +10,13 @@ import { useEffect } from "react";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
 import CourseList from "./pages/course/CourseList";
 import CourseDetail from "./pages/course/CourseDetail";
 import Learning from "./pages/course/Learning";
 import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
 import MyLearning from "./pages/MyLearning";
+import MyTeaching from "./pages/MyTeaching";
 import Wishlist from "./pages/Wishlist";
 import MyOrders from "./pages/MyOrders";
 
@@ -77,6 +77,9 @@ function AppContent() {
           <Route path="/my-learning" element={
             <ProtectedRoute><MyLearning /></ProtectedRoute>
           } />
+          <Route path="/my-teaching" element={
+            <ProtectedRoute><MyTeaching /></ProtectedRoute>
+          } />
           <Route path="/wishlist" element={
             <ProtectedRoute><Wishlist /></ProtectedRoute>
           } />
@@ -85,9 +88,6 @@ function AppContent() {
           } />
           <Route path="/my-orders" element={
             <ProtectedRoute><MyOrders /></ProtectedRoute>
-          } />
-          <Route path="/dashboard" element={
-            <ProtectedRoute><Dashboard /></ProtectedRoute>
           } />
 
           {/* ===== ADMIN ROUTES ===== */}

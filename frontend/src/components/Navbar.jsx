@@ -85,12 +85,27 @@ const Navbar = () => {
           </Link>
           {user && (
             <>
-              <Link to="/dashboard" className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}>
-                Dashboard
-              </Link>
-              <Link to="/my-learning" className={`nav-link ${isActive("/my-learning") ? "active" : ""}`}>
-                Học Tập
-              </Link>
+              {/* Menu cho Học viên */}
+              {user.role === "student" && (
+                <Link to="/my-learning" className={`nav-link ${isActive("/my-learning") ? "active" : ""}`}>
+                  Học Tập
+                </Link>
+              )}
+
+              {/* Menu cho Giảng viên */}
+              {user.role === "instructor" && (
+                <Link to="/my-teaching" className={`nav-link ${isActive("/my-teaching") ? "active" : ""}`}>
+                  Giảng Dạy
+                </Link>
+              )}
+
+              {/* Menu cho Admin */}
+              {user.role === "admin" && (
+                <Link to="/admin" className={`nav-link ${isActive("/admin") ? "active" : ""}`}>
+                  Quản Trị
+                </Link>
+              )}
+
               <Link to="/my-orders" className={`nav-link ${isActive("/my-orders") ? "active" : ""}`}>
                 Đơn Hàng
               </Link>

@@ -17,6 +17,7 @@ export default function AdminCourses() {
   const [categories, setCategories] = useState([]);    // Danh mục để chọn
   const [loading, setLoading] = useState(true);        // Trạng thái loading
   const [submitting, setSubmitting] = useState(false); // Đang submit form
+  const [instructors, setInstructors] = useState([]); // Danh sách giảng viên
 
   // ================================================
   // STATE FORM: Mở form tạo mới HOẶC sửa
@@ -38,7 +39,10 @@ export default function AdminCourses() {
     status: "draft",     // Trạng thái: draft / published / archived
     tags: "",            // Tags: cách nhau bằng dấu phẩy
     prerequisites: "",   // Yêu cầu trước khi học
+    prerequisites: "",   // Yêu cầu trước khi học
     whatYouLearn: "",    // Học được gì sau khóa học
+    instructor: "",      // ID giảng viên
+    authorName: "",      // Tên giảng viên hiển thị
   });
 
   // ================================================
@@ -64,13 +68,15 @@ export default function AdminCourses() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Gọi song song 2 API để tối ưu thời gian
-      const [coursesRes, categoriesRes] = await Promise.all([
+      // Gọi song song 3 API để tối ưu thời gian
+      const [coursesRes, categoriesRes, instructorsRes] = await Promise.all([
         getAllCourses({ limit: 100, status: "all" }),  // Admin can see draft/published/archived
         getAllCategories(),
+        import("../../services/authService").then(m => m.getAllUsers({ role: "instructor", limit: 100 })),
       ]);
       if (coursesRes.data.success) setCourses(coursesRes.data.data);
       if (categoriesRes.data.success) setCategories(categoriesRes.data.data);
+      if (instructorsRes.data.success) setInstructors(instructorsRes.data.data);
     } catch (err) {
       console.error("Lỗi tải dữ liệu:", err);
       showMessage("error", "Không thể tải dữ liệu khóa học");
@@ -97,6 +103,7 @@ export default function AdminCourses() {
       title: "", description: "", price: 0, discountPrice: "",
       category: categories[0]?._id || "", level: "Beginner", image: "",
       status: "draft", tags: "", prerequisites: "", whatYouLearn: "",
+      instructor: "", authorName: "",
     });
     setShowForm(true);
     setMessage({ type: "", text: "" });
@@ -120,6 +127,8 @@ export default function AdminCourses() {
       tags: course.tags?.join(", ") || "",
       prerequisites: course.prerequisites || "",
       whatYouLearn: course.whatYouLearn || "",
+      instructor: course.instructor?._id || course.instructor || "",
+      authorName: course.authorName || "",
     });
     setShowForm(true);
     setMessage({ type: "", text: "" });
@@ -298,6 +307,42 @@ export default function AdminCourses() {
                     <option key={cat._id} value={cat._id}>{cat.name}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Select: Giảng viên phụ trách */}
+              <div className="admin-form-group">
+                <label>Giảng viên phụ trách <span className="required">*</span></label>
+                <select
+                  value={formData.instructor}
+                  onChange={(e) => {
+                    const instId = e.target.value;
+                    const inst = instructors.find(i => i._id === instId);
+                    setFormData({ 
+                      ...formData, 
+                      instructor: instId,
+                      authorName: inst ? inst.name : formData.authorName 
+                    });
+                  }}
+                  required
+                >
+                  <option value="">-- Chọn giảng viên --</option>
+                  {instructors.map((ins) => (
+                    <option key={ins._id} value={ins._id}>{ins.name} ({ins.email})</option>
+                  ))}
+                  {/* Trường hợp admin muốn tự gán hoặc instructor khác chưa load kịp */}
+                  <option value="custom">-- Khác (Tự nhập tên) --</option>
+                </select>
+              </div>
+
+              {/* Input: Tên giảng viên hiển thị */}
+              <div className="admin-form-group">
+                <label>Tên giảng viên hiển thị</label>
+                <input
+                  type="text"
+                  value={formData.authorName}
+                  onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
+                  placeholder="VD: Nguyễn Văn A"
+                />
               </div>
 
               {/* Input: Giá gốc */}
@@ -523,7 +568,7 @@ export default function AdminCourses() {
                           <div className="admin-course-cell">
                             <div className="admin-course-cell-title">{course.title}</div>
                             <div className="admin-course-cell-cat">
-                              {course.isFeatured ? "Nổi bật" : ""} {course.level}
+                              {course.isFeatured ? "Nổi bật" : ""} {course.level} • {course.authorName || "Ẩn danh"}
                             </div>
                           </div>
                         </td>

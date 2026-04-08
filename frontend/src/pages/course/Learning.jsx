@@ -19,22 +19,28 @@ export default function Learning() {
   // MOCK RICHER CURRICULUM
   // ================================================
   const defaultCurriculum = [
-    { title: "Chương 1: Khởi động", lessons: [
-      { id: "l1", title: "1.1 Tại sao bạn nên học khóa này?", type: "video", duration: 5, videoUrl: "https://www.youtube.com/embed/jfKfPfyJRdk" },
-      { id: "l2", title: "1.2 Phương pháp học tập x10", type: "video", duration: 10, videoUrl: "https://www.youtube.com/embed/WJzSMRb4b08" },
-      { id: "l3", title: "1.3 Slide & Tài liệu đính kèm (PDF)", type: "document", duration: 15, docUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
-    ]},
-    { title: "Chương 2: Kiến thức nền tảng", lessons: [
-      { id: "l4", title: "2.1 Các khái niệm cơ bản (Lý thuyết)", type: "document", duration: 20, content: "Trong bài viết này, chúng ta sẽ tìm hiểu về các khái niệm rất cơ bản.\n\n 1. Biến (Variables)\n 2. Vòng lặp (Loops)\n 3. Cấu trúc điều kiện (Conditionals)\n \n Hãy đọc kỹ trước khi thực hành nhé!" },
-      { id: "l5", title: "2.2 Hướng dẫn cài đặt công cụ", type: "video", duration: 45, videoUrl: "https://www.youtube.com/embed/zH3h1E2zEvk" },
-      { id: "l6", title: "2.3 Demo tính năng thực hành", type: "video", duration: 30, videoUrl: "https://www.youtube.com/embed/zpOULjyy-n8" }
-    ]},
-    { title: "Chương 3: Thực chiến Xây dựng App", lessons: [
-      { id: "l7", title: "3.1 Dựng khung Project UI", type: "video", duration: 25, videoUrl: "https://www.youtube.com/embed/I0TDeJ-I1l4" },
-      { id: "l8", title: "3.2 Bố cục CSS căn bản", type: "video", duration: 60, videoUrl: "https://www.youtube.com/embed/OqWqWXYYEXg" },
-      { id: "l9", title: "3.3 Code Backend & API", type: "video", duration: 55, videoUrl: "https://www.youtube.com/embed/W6NZfCO5SIk" },
-      { id: "l10", title: "3.4 Tích hợp và Deploy Cloud", type: "document", duration: 40, content: "Bài này cung cấp lệnh deploy lên máy chủ.\n$ npm run build\n$ pm2 start server.js\n\nChúc mừng bạn đã hoàn thành!" }
-    ]}
+    {
+      title: "Chương 1: Khởi động", lessons: [
+        { id: "l1", title: "1.1 Tại sao bạn nên học khóa này?", type: "video", duration: 5, videoUrl: "https://www.youtube.com/embed/jfKfPfyJRdk" },
+        { id: "l2", title: "1.2 Phương pháp học tập x10", type: "video", duration: 10, videoUrl: "https://www.youtube.com/embed/WJzSMRb4b08" },
+        { id: "l3", title: "1.3 Slide & Tài liệu đính kèm (PDF)", type: "document", duration: 15, docUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+      ]
+    },
+    {
+      title: "Chương 2: Kiến thức nền tảng", lessons: [
+        { id: "l4", title: "2.1 Các khái niệm cơ bản (Lý thuyết)", type: "document", duration: 20, content: "Trong bài viết này, chúng ta sẽ tìm hiểu về các khái niệm rất cơ bản.\n\n 1. Biến (Variables)\n 2. Vòng lặp (Loops)\n 3. Cấu trúc điều kiện (Conditionals)\n \n Hãy đọc kỹ trước khi thực hành nhé!" },
+        { id: "l5", title: "2.2 Hướng dẫn cài đặt công cụ", type: "video", duration: 45, videoUrl: "https://www.youtube.com/embed/zH3h1E2zEvk" },
+        { id: "l6", title: "2.3 Demo tính năng thực hành", type: "video", duration: 30, videoUrl: "https://www.youtube.com/embed/zpOULjyy-n8" }
+      ]
+    },
+    {
+      title: "Chương 3: Thực chiến Xây dựng App", lessons: [
+        { id: "l7", title: "3.1 Dựng khung Project UI", type: "video", duration: 25, videoUrl: "https://www.youtube.com/embed/I0TDeJ-I1l4" },
+        { id: "l8", title: "3.2 Bố cục CSS căn bản", type: "video", duration: 60, videoUrl: "https://www.youtube.com/embed/OqWqWXYYEXg" },
+        { id: "l9", title: "3.3 Code Backend & API", type: "video", duration: 55, videoUrl: "https://www.youtube.com/embed/W6NZfCO5SIk" },
+        { id: "l10", title: "3.4 Tích hợp và Deploy Cloud", type: "document", duration: 40, content: "Bài này cung cấp lệnh deploy lên máy chủ.\n$ npm run build\n$ pm2 start server.js\n\nChúc mừng bạn đã hoàn thành!" }
+      ]
+    }
   ];
 
   useEffect(() => {
@@ -66,13 +72,19 @@ export default function Learning() {
         return;
       }
 
-      // 2. Kiểm tra đã mua chưa
+      // 2. Kiểm tra quyền truy cập (Đã mua, Admin, hoặc Chủ sở hữu)
       const enrollRes = await getMyEnrolledCourses();
       let enrolled = false;
+      const isAdmin = user?.role === "admin";
+      // Lưu ý: loadedCourse.instructor có thể là object (do populate) hoặc ID
+      const instructorId = loadedCourse?.instructor?._id || loadedCourse?.instructor;
+      const isInstructorOwner = user?.role === "instructor" && instructorId === user?.id;
+
       if (enrollRes.data?.success && enrollRes.data.data) {
         enrolled = enrollRes.data.data.some((c) => c.slug === slug);
-        setIsEnrolled(enrolled);
       }
+
+      setIsEnrolled(enrolled || isAdmin || isInstructorOwner);
 
       // 3. Set bài học đầu tiên mặc định
       const curriculum = loadedCourse?.curriculum?.length > 0 ? loadedCourse.curriculum : defaultCurriculum;
@@ -130,7 +142,7 @@ export default function Learning() {
   }
 
   const curriculum = course.curriculum?.length > 0 ? course.curriculum : defaultCurriculum;
-  
+
   // Tính tổng tiến độ
   const totalLessons = curriculum.reduce((acc, curr) => acc + curr.lessons.length, 0);
   const completedCount = progress.size;
@@ -145,7 +157,7 @@ export default function Learning() {
         </Link>
         <span style={{ margin: "0 16px", color: "#cbd5e1" }}>|</span>
         <h2 style={{ fontSize: "1rem", margin: 0, fontWeight: "600", flex: 1 }}>{course.title}</h2>
-        
+
         {/* Progress Bar Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <span style={{ fontSize: "0.85rem", fontWeight: "600" }}>{progressPercent}% Hoàn thành</span>
@@ -157,7 +169,7 @@ export default function Learning() {
 
       {/* ===== MAIN CONTENT AREA ===== */}
       <div style={{ flex: 1, padding: "70px 40px 40px", overflowY: "auto", display: "flex", flexDirection: "column", background: "#ffffff" }}>
-        
+
         {activeLesson?.type === 'document' ? (
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: "2.5rem", fontWeight: "800", marginBottom: "24px", color: "#0f172a", display: "flex", alignItems: "center", gap: "12px" }}>
@@ -175,8 +187,8 @@ export default function Learning() {
         ) : (
           <div style={{ flex: 1, background: "#000", borderRadius: "12px", overflow: "hidden", position: "relative", minHeight: "500px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)" }}>
             {activeLesson ? (
-              <iframe 
-                src={activeLesson.videoUrl || "https://www.youtube.com/embed/SqcY0GlETPk"} 
+              <iframe
+                src={activeLesson.videoUrl || "https://www.youtube.com/watch?v=7EWYl3VbIHI&list=RDK57drqpLB4Q&index=2"}
                 title={activeLesson.title}
                 style={{ width: "100%", height: "100%", border: "none", position: "absolute", top: 0, left: 0 }}
                 allowFullScreen
@@ -197,10 +209,10 @@ export default function Learning() {
               {activeLesson?.type === 'video' ? "Thưởng thức video bài giảng." : "Hãy đọc kỹ tài liệu thực hành."}
             </p>
           </div>
-          
+
           {/* NÚT THÀNH CÔNG */}
           {activeLesson && (
-            <button 
+            <button
               onClick={() => handleToggleComplete(activeLesson.id || activeLesson.title)}
               style={{
                 display: "flex", alignItems: "center", gap: "8px",
@@ -238,10 +250,10 @@ export default function Learning() {
                 const isPdf = url.includes('.pdf');
                 const title = url.split('/').pop() || `Tài liệu đính kèm ${idx + 1}`;
                 return (
-                  <a 
-                    key={idx} 
-                    href={url} 
-                    target="_blank" 
+                  <a
+                    key={idx}
+                    href={url}
+                    target="_blank"
                     rel="noreferrer"
                     style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", textDecoration: "none", color: "#2563eb", fontWeight: "600", transition: "all 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}
                   >
@@ -265,7 +277,7 @@ export default function Learning() {
               <strong style={{ color: "#10b981", display: "block" }}>Bạn đang xem trước miễn phí</strong>
               <span style={{ fontSize: "0.85rem", color: "#6ee7b7" }}>Để mở khóa toàn bộ bài giảng (Chương 2 trở đi), vui lòng đăng ký khóa học.</span>
             </div>
-            <button 
+            <button
               onClick={() => navigate(`/checkout?course=${course.slug}`)}
               style={{ padding: "10px 20px", background: "#10b981", color: "white", border: "none", borderRadius: "6px", fontWeight: "bold", cursor: "pointer" }}
             >
@@ -276,7 +288,7 @@ export default function Learning() {
       </div>
 
       {/* ===== SIDEBAR CURRICULUM ===== */}
-      <div style={{ width: "350px", background: "#ffffff", borderLeft: "1px solid #e2e8f0", display: "flex", flexDirection: "column", marginTop:"50px" }}>
+      <div style={{ width: "350px", background: "#ffffff", borderLeft: "1px solid #e2e8f0", display: "flex", flexDirection: "column", marginTop: "50px" }}>
         <div style={{ padding: "20px", borderBottom: "1px solid #e2e8f0", flexShrink: 0 }}>
           <h3 style={{ margin: 0, fontSize: "1.1rem", color: "#0f172a" }}>Nội dung bài học</h3>
         </div>
@@ -287,7 +299,7 @@ export default function Learning() {
 
             return (
               <div key={sIdx} style={{ marginBottom: "12px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", overflow: "hidden" }}>
-                <div 
+                <div
                   onClick={() => setExpandedSection(expandedSection === sIdx ? -1 : sIdx)}
                   style={{ padding: "16px", background: expandedSection === sIdx ? "#f1f5f9" : "#ffffff", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "background 0.2s" }}
                 >
@@ -304,14 +316,14 @@ export default function Learning() {
                     {section.lessons.map((lesson, lIdx) => {
                       const isActive = activeLesson?.chapterIndex === sIdx && activeLesson?.lessonIndex === lIdx;
                       const isCompleted = progress.has(lesson.id || lesson.title);
-                      
+
                       return (
-                        <div 
-                          key={lIdx} 
+                        <div
+                          key={lIdx}
                           onClick={() => handleLessonSelect(lesson, sIdx, lIdx)}
-                          style={{ 
-                            padding: "14px 16px", 
-                            borderTop: "1px solid #e2e8f0", 
+                          style={{
+                            padding: "14px 16px",
+                            borderTop: "1px solid #e2e8f0",
                             cursor: "pointer",
                             background: isActive ? "#eff6ff" : "transparent",
                             color: isActive ? "#2563eb" : "#475569",
@@ -324,7 +336,7 @@ export default function Learning() {
                           {/* MÀU XANH NẾU HOÀN THÀNH, Ổ KHÓA NẾU BỊ KHÓA */}
                           <div style={{ flexShrink: 0 }}>
                             {isCompleted ? (
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="#10b981"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z"/></svg>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="#10b981"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z" /></svg>
                             ) : isSectionLocked ? (
                               <span style={{ display: "inline-flex", alignItems: "center", color: "#cbd5e1" }}>
                                 <Icon name="lock" size={16} />
